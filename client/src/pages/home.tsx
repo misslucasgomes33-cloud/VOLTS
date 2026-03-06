@@ -1,6 +1,6 @@
-import { Search, MapPin, Zap, Star, ChevronRight } from "lucide-react";
+import { Search, MapPin, Zap, Star, ChevronRight, Bot, TrendingDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 
 import burgerImg from '@/assets/burger.png';
@@ -24,6 +24,8 @@ const recommended = [
 ];
 
 export default function Home() {
+  const [, setLocation] = useLocation();
+
   return (
     <div className="flex flex-col min-h-full pb-24">
       {/* Header */}
@@ -51,6 +53,28 @@ export default function Home() {
             placeholder="O que você quer pedir hoje?" 
             className="pl-12 h-12 bg-zinc-900 border-white/5 rounded-2xl text-white focus-visible:ring-primary/30 shadow-inner"
           />
+        </div>
+      </div>
+
+      {/* Dynamic AI Alert */}
+      <div className="px-5 mt-4">
+        <div onClick={() => setLocation('/chat')} className="cursor-pointer bg-primary/10 border border-primary/20 rounded-2xl p-4 flex gap-4 items-start relative overflow-hidden group hover:bg-primary/15 transition-colors">
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/20 blur-2xl rounded-full" />
+          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
+            <Bot className="w-5 h-5 text-primary" />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-xs font-bold text-primary uppercase tracking-wider">Radar IA Ativo</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+            </div>
+            <p className="text-sm text-zinc-300 leading-snug">
+              Demanda alta identificada no Centro. Acabei de direcionar +20 entregadores. <strong className="text-white">Aproveite 15% OFF</strong> em Açaí para balancear o fluxo!
+            </p>
+          </div>
         </div>
       </div>
 
@@ -88,7 +112,9 @@ export default function Home() {
       {/* Recommended list */}
       <div className="px-5 mt-8 mb-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-display font-bold text-white">Recomendados</h2>
+          <h2 className="text-lg font-display font-bold text-white flex items-center gap-2">
+            Recomendados pela IA <TrendingDown className="w-4 h-4 text-green-500" />
+          </h2>
           <span className="text-xs text-primary font-medium">Ver todos</span>
         </div>
 
