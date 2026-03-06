@@ -50,7 +50,7 @@ export default function Cart() {
               <RadioGroupItem value="portaria" id="portaria" className="text-primary border-zinc-600" />
               <Label htmlFor="portaria" className="flex-1 cursor-pointer">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-white">Entregar na Portaria</span>
+                  <span className="font-medium text-white">Entregar na portaria (padrão)</span>
                   <span className="text-primary text-sm font-semibold">Grátis</span>
                 </div>
                 <p className="text-xs text-zinc-500 mt-1">Você desce para buscar</p>
@@ -62,7 +62,7 @@ export default function Cart() {
                 <RadioGroupItem value="porta" id="porta" className="text-primary border-zinc-600" />
                 <Label htmlFor="porta" className="flex-1 cursor-pointer">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium text-white">Entregar dentro do Condomínio</span>
+                    <span className="font-medium text-white">Entregar na porta do apartamento / dentro do condomínio</span>
                     <span className="text-white text-sm font-semibold">+ R$ {doorFee[0]},00</span>
                   </div>
                   <p className="text-xs text-zinc-500 mt-1">O entregador entra no condomínio e vai até sua porta</p>
