@@ -55,9 +55,18 @@ export default function Orders() {
                 </div>
               </div>
             </div>
+
+            <div className="mt-4 bg-primary/10 border border-primary/20 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden">
+              <div className="absolute right-0 top-0 w-16 h-16 bg-primary/20 blur-2xl rounded-full" />
+              <span className="text-[10px] text-primary font-bold uppercase tracking-widest mb-1 z-10">Código de Confirmação</span>
+              <span className="text-4xl font-display font-black text-white tracking-[0.25em] z-10">7492</span>
+              <span className="text-[11px] text-zinc-400 mt-2 text-center z-10 max-w-[80%] leading-tight">
+                Passe este código para o entregador quando ele chegar para finalizar a corrida
+              </span>
+            </div>
             
             <div className="mt-4 pt-3 border-t border-white/5 flex justify-between text-sm">
-              <span className="text-zinc-400 flex items-center gap-1"><MapPin className="w-3 h-3"/> Entrega na Porta</span>
+              <span className="text-zinc-400 flex items-center gap-1"><MapPin className="w-3 h-3"/> Entrega no Condomínio</span>
               <span className="text-white font-bold">R$ 54,90</span>
             </div>
           </div>
