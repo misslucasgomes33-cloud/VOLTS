@@ -1,4 +1,4 @@
-import { ArrowLeft, Send, Bot, Zap, Tag, MapPin, Search, Headset, Info } from "lucide-react";
+import { ArrowLeft, Send, Bot, Zap, Tag, MapPin, Search, Headset, Info, AlertTriangle, Clock } from "lucide-react";
 import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect } from "react";
@@ -6,10 +6,16 @@ import { useState, useRef, useEffect } from "react";
 export default function Chat() {
   const [, setLocation] = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
   const [messages, setMessages] = useState([
     { 
       role: 'assistant', 
-      text: 'Oi! 👋 Sou a IA do VOLTS. Posso te ajudar a encontrar comida, acompanhar seu pedido ou explicar como funciona o app.' 
+      isProactiveAlert: true,
+      text: 'Notei que o restaurante "Pizza Express" está demorando um pouco mais que o normal (10 min de atraso). Mas não se preocupe! Já entrei em contato com eles e o seu pedido está no forno. Para compensar a espera, aqui está um cupom de frete grátis para sua próxima compra! 🍕' 
+    },
+    { 
+      role: 'assistant', 
+      text: 'Oi! 👋 Sou a IA do VOLTS. Posso te ajudar a encontrar comida, resolver problemas com pedidos, ou explicar como funciona o app.' 
     }
   ]);
   const [input, setInput] = useState('');
@@ -43,8 +49,12 @@ export default function Chat() {
         responseText = 'Que tal um Volt Burger? É o mais bem avaliado perto de você, chega em 20 min. Ou talvez um Açaí Energy para refrescar? 😋';
       } else if (lowerInput.includes('suporte') || lowerInput.includes('problema') || lowerInput.includes('ajuda') || lowerInput.includes('falar')) {
         responseText = 'Entendi. Vou te conectar agora mesmo com um de nossos atendentes humanos para resolver isso rápido para você. Um momento... 🎧';
+      } else if (lowerInput.includes('demora') || lowerInput.includes('atrasado') || lowerInput.includes('motoboy') || lowerInput.includes('entregador')) {
+        responseText = 'Poxa, vi aqui que o motoboy parou por 5 minutos no trajeto. Já enviei um alerta para ele e estou monitorando. Se ele não se mover em 2 minutos, vou acionar o suporte e te enviar um cupom, combinado? 🚦';
+      } else if (lowerInput.includes('faltando') || lowerInput.includes('veio errado') || lowerInput.includes('errado')) {
+        responseText = 'Que chato! 😔 Pelo visto o restaurante esqueceu algum item. Não se preocupe! Posso pedir para eles enviarem o que faltou agora mesmo ou fazer o reembolso automático na sua carteira VOLTS. Qual você prefere?';
       } else {
-        responseText = 'Certo! Se precisar de dicas do que comer, quiser saber de promoções ou tirar dúvidas sobre entregas (como a taxa da portaria), é só me perguntar. 😊';
+        responseText = 'Certo! Se precisar resolver algum B.O com pedido, quiser saber de promoções ou tirar dúvidas sobre entregas, é só me perguntar. Estou aqui pra ajudar! 😊';
       }
 
       setMessages(prev => [...prev, { 
@@ -72,9 +82,9 @@ export default function Chat() {
             <Bot className="w-5 h-5 text-black" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white leading-tight">Guia VOLTS</h1>
+            <h1 className="text-sm font-bold text-white leading-tight">Suporte VOLTS</h1>
             <p className="text-[10px] text-zinc-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> Online e pronto pra ajudar
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> IA Monitorando Pedidos
             </p>
           </div>
         </div>
@@ -84,19 +94,39 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto p-5 space-y-4 pb-32 hide-scrollbar">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'assistant' ? 'justify-start' : 'justify-end'}`}>
-            {msg.role === 'assistant' && (
+            {msg.role === 'assistant' && !msg.isProactiveAlert && (
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mr-2 shrink-0 border border-primary/30 mt-auto mb-1">
                 <Bot className="w-4 h-4 text-primary" />
               </div>
             )}
             
-            <div className={`max-w-[80%] rounded-2xl p-3.5 shadow-sm ${
-              msg.role === 'assistant' 
-                ? 'bg-zinc-900 border border-white/5 text-zinc-200 rounded-bl-sm' 
-                : 'bg-primary text-black font-medium rounded-br-sm'
-            }`}>
-              <p className="text-sm leading-relaxed">{msg.text}</p>
-            </div>
+            {msg.isProactiveAlert ? (
+               <div className="w-full bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex flex-col gap-3 mt-2 mb-4">
+                 <div className="flex items-center gap-2">
+                   <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                     <Clock className="w-4 h-4 text-red-500" />
+                   </div>
+                   <p className="text-xs font-bold text-red-400 uppercase tracking-wider">Aviso Automático IA</p>
+                 </div>
+                 <p className="text-sm text-zinc-200 leading-relaxed">{msg.text}</p>
+                 <div className="flex gap-2 mt-2">
+                    <button onClick={() => handleQuickAction("Quero o reembolso na carteira")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-lg text-xs font-medium text-white hover:bg-zinc-800 transition-colors">
+                      Aceitar Cupom
+                    </button>
+                    <button onClick={() => handleQuickAction("Falar com suporte")} className="bg-red-500/20 border border-red-500/30 px-3 py-2 rounded-lg text-xs font-medium text-white hover:bg-red-500/30 transition-colors">
+                      Falar com humano
+                    </button>
+                 </div>
+              </div>
+            ) : (
+              <div className={`max-w-[80%] rounded-2xl p-3.5 shadow-sm ${
+                msg.role === 'assistant' 
+                  ? 'bg-zinc-900 border border-white/5 text-zinc-200 rounded-bl-sm' 
+                  : 'bg-primary text-black font-medium rounded-br-sm'
+              }`}>
+                <p className="text-sm leading-relaxed">{msg.text}</p>
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -105,17 +135,14 @@ export default function Chat() {
       <div className="absolute bottom-0 left-0 w-full bg-zinc-950/95 backdrop-blur-md border-t border-white/5">
         {/* Quick Actions */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar p-3 border-b border-white/5">
-          <button onClick={() => handleQuickAction("Ver promoções")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
-            <Tag className="w-3.5 h-3.5 text-primary" /> Ver promoções
+          <button onClick={() => handleQuickAction("Meu pedido está atrasado")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <Clock className="w-3.5 h-3.5 text-primary" /> Pedido atrasado
+          </button>
+          <button onClick={() => handleQuickAction("Veio faltando um item")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <AlertTriangle className="w-3.5 h-3.5 text-primary" /> Veio faltando item
           </button>
           <button onClick={() => handleQuickAction("Acompanhar pedido")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
-            <MapPin className="w-3.5 h-3.5 text-primary" /> Acompanhar pedido
-          </button>
-          <button onClick={() => handleQuickAction("Como funciona a taxa da porta?")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
-            <Info className="w-3.5 h-3.5 text-primary" /> Taxa de entrega na porta
-          </button>
-          <button onClick={() => handleQuickAction("Restaurantes próximos")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
-            <Search className="w-3.5 h-3.5 text-primary" /> Restaurantes próximos
+            <MapPin className="w-3.5 h-3.5 text-primary" /> Acompanhar motoboy
           </button>
           <button onClick={() => handleQuickAction("Falar com suporte")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
             <Headset className="w-3.5 h-3.5 text-primary" /> Falar com suporte
@@ -128,7 +155,7 @@ export default function Chat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Digite o que precisa..." 
+              placeholder="Descreva seu problema..." 
               className="h-12 bg-zinc-900 border-white/10 rounded-full pl-4 pr-12 text-white focus-visible:ring-primary/50 text-sm"
             />
             <button 
