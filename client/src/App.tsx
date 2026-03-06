@@ -17,7 +17,7 @@ import BottomNav from "@/components/layout/bottom-nav";
 
 function Router() {
   const [location] = useLocation();
-  const isAuthRoute = ['/', '/login', '/register', '/recovery'].includes(location);
+  const isAuthRoute = location === '/' || location.startsWith('/login') || location.startsWith('/register') || location.startsWith('/recovery');
 
   return (
     <div className="mobile-container">
