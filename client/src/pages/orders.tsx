@@ -35,16 +35,28 @@ export default function Orders() {
                 <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0 z-10" />
                 <div className="absolute left-[3px] top-3 bottom-[-20px] w-[2px] bg-zinc-800" />
                 <div>
-                  <p className="text-sm text-white font-medium">Preparando</p>
+                  <p className="text-sm text-white font-medium">Preparando pedido</p>
                   <p className="text-xs text-zinc-500">20:15</p>
                 </div>
               </div>
+
               <div className="flex items-start gap-3 relative">
-                <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0 z-10 shadow-[0_0_8px_rgba(255,204,0,0.8)]" />
+                <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0 z-10 shadow-[0_0_8px_rgba(255,204,0,0.8)] animate-pulse" />
+                <div className="absolute left-[3px] top-3 bottom-[-20px] w-[2px] bg-zinc-800" />
+                <div className="bg-primary/5 border border-primary/20 p-2 rounded-lg -mt-1 flex-1">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-sm text-primary font-bold">Despacho IA</p>
+                    <Zap className="w-3 h-3 text-primary" fill="currentColor" />
+                  </div>
+                  <p className="text-xs text-zinc-400 leading-tight">Nosso sistema de controle de fluxo está conectando seu pedido ao entregador mais rápido e próximo.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 relative">
+                <div className="w-2 h-2 rounded-full bg-zinc-700 mt-1.5 shrink-0 z-10" />
                 <div className="absolute left-[3px] top-3 bottom-[-20px] w-[2px] bg-zinc-800" />
                 <div>
-                  <p className="text-sm text-white font-medium">Saiu para entrega</p>
-                  <p className="text-xs text-zinc-500">20:30</p>
+                  <p className="text-sm text-zinc-400 font-medium">Saiu para entrega</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 relative">
