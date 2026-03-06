@@ -1,45 +1,64 @@
-import { ArrowLeft, Send, Bot, Zap, TrendingUp, Clock, Percent } from "lucide-react";
+import { ArrowLeft, Send, Bot, Zap, Tag, MapPin, Search, Headset, Info } from "lucide-react";
 import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Chat() {
   const [, setLocation] = useLocation();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState([
     { 
       role: 'assistant', 
-      text: 'Olá! Sou a IA Assistente do VOLTS ⚡. Analiso o fluxo de entregas e a demanda em tempo real para te oferecer a melhor experiência.' 
-    },
-    {
-      role: 'assistant',
-      isSystemAlert: true,
-      text: 'No momento, identifiquei alta demanda no Centro. Realoquei entregadores para manter nossas entregas ultra-rápidas. Que tal pedir agora e evitar atrasos?'
+      text: 'Oi! 👋 Sou a IA do VOLTS. Posso te ajudar a encontrar comida, acompanhar seu pedido ou explicar como funciona o app.' 
     }
   ]);
   const [input, setInput] = useState('');
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const handleSend = () => {
     if (!input.trim()) return;
     
-    setMessages([...messages, { role: 'user', text: input }]);
+    const userText = input;
+    setMessages(prev => [...prev, { role: 'user', text: userText }]);
     setInput('');
     
     setTimeout(() => {
-      let responseText = 'Analisando o clima, trânsito e fluxo de pedidos atual...';
+      let responseText = '';
+      const lowerInput = userText.toLowerCase();
       
-      if (input.toLowerCase().includes('promoção') || input.toLowerCase().includes('desconto')) {
-        responseText = 'Encontrei uma oportunidade! Com base no horário atual, as pizzarias estão com fluxo tranquilo. Posso aplicar um cupom relâmpago de 20% OFF na Pizza Express para você agora mesmo. Aceita?';
-      } else if (input.toLowerCase().includes('demora') || input.toLowerCase().includes('tempo')) {
-        responseText = 'Nosso algoritmo de despacho inteligente já previu a alta demanda na sua área. Direcionamos 15 entregadores adicionais para o seu bairro. Seu pedido chegará no prazo!';
+      if (lowerInput.includes('promoção') || lowerInput.includes('desconto')) {
+        responseText = 'Hoje temos 20% OFF na Pizza Express e entrega grátis no Volt Burger para pedir agora. Quer dar uma olhada na tela principal? 🍕🍔';
+      } else if (lowerInput.includes('pedido') || lowerInput.includes('cade') || lowerInput.includes('cadê') || lowerInput.includes('acompanhar')) {
+        responseText = 'Seu pedido #4829 da Pizza Express já está com o entregador e chega em aprox. 15 minutos! Você pode ver no menu "Pedidos". 🛵💨';
+      } else if (lowerInput.includes('porta') || lowerInput.includes('portaria') || lowerInput.includes('taxa')) {
+        responseText = 'Funciona assim: a "Entrega na portaria" é grátis (padrão). Mas se quiser que o entregador suba até sua porta, você escolhe a "Entrega dentro do condomínio" no carrinho e define uma caixinha de R$5 a R$13 que vai 100% para ele! 🏢';
+      } else if (lowerInput.includes('restaurante') || lowerInput.includes('fome') || lowerInput.includes('comer')) {
+        responseText = 'Que tal um Volt Burger? É o mais bem avaliado perto de você, chega em 20 min. Ou talvez um Açaí Energy para refrescar? 😋';
+      } else if (lowerInput.includes('suporte') || lowerInput.includes('problema') || lowerInput.includes('ajuda') || lowerInput.includes('falar')) {
+        responseText = 'Entendi. Vou te conectar agora mesmo com um de nossos atendentes humanos para resolver isso rápido para você. Um momento... 🎧';
       } else {
-        responseText = 'Entendi! Como nossa malha de entregadores está distribuída eficientemente agora, qualquer pedido que você fizer será coletado em no máximo 3 minutos pelo entregador mais próximo.';
+        responseText = 'Certo! Se precisar de dicas do que comer, quiser saber de promoções ou tirar dúvidas sobre entregas (como a taxa da portaria), é só me perguntar. 😊';
       }
 
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         text: responseText 
       }]);
-    }, 1000);
+    }, 800);
+  };
+
+  const handleQuickAction = (text: string) => {
+    setInput(text);
+    setTimeout(() => {
+      document.getElementById('chat-send-btn')?.click();
+    }, 100);
   };
 
   return (
@@ -49,79 +68,77 @@ export default function Chat() {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-2">
-          <Bot className="w-5 h-5 text-primary" />
-          <h1 className="text-lg font-display font-bold text-white">Assistente IA</h1>
+          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+            <Bot className="w-5 h-5 text-black" />
+          </div>
+          <div>
+            <h1 className="text-sm font-bold text-white leading-tight">Guia VOLTS</h1>
+            <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> Online e pronto pra ajudar
+            </p>
+          </div>
         </div>
         <div className="w-10 h-10"></div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-4 pb-24 hide-scrollbar">
-        <div className="flex justify-center mb-4">
-          <div className="bg-primary/10 border border-primary/20 text-primary text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-            <Zap className="w-3 h-3" fill="currentColor" />
-            Controle de Fluxo Ativo
-          </div>
-        </div>
-
-        {/* Suggestion Chips */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-          <button onClick={() => { setInput("Tem alguma promoção?"); handleSend(); }} className="bg-zinc-900 border border-white/10 px-3 py-1.5 rounded-full text-xs text-white whitespace-nowrap flex items-center gap-1.5">
-            <Percent className="w-3 h-3 text-primary" /> Sugerir Promoção
-          </button>
-          <button onClick={() => { setInput("Como está o tempo de entrega?"); handleSend(); }} className="bg-zinc-900 border border-white/10 px-3 py-1.5 rounded-full text-xs text-white whitespace-nowrap flex items-center gap-1.5">
-            <Clock className="w-3 h-3 text-primary" /> Tempo de Entrega
-          </button>
-          <button onClick={() => { setInput("Qual a tendência de pedidos?"); handleSend(); }} className="bg-zinc-900 border border-white/10 px-3 py-1.5 rounded-full text-xs text-white whitespace-nowrap flex items-center gap-1.5">
-            <TrendingUp className="w-3 h-3 text-primary" /> Tendências
-          </button>
-        </div>
-
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 pb-32 hide-scrollbar">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'assistant' ? 'justify-start' : 'justify-end'}`}>
-            {msg.role === 'assistant' && !msg.isSystemAlert && (
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mr-2 shrink-0">
+            {msg.role === 'assistant' && (
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mr-2 shrink-0 border border-primary/30 mt-auto mb-1">
                 <Bot className="w-4 h-4 text-primary" />
               </div>
             )}
             
-            {msg.isSystemAlert ? (
-              <div className="w-full bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-3 mt-2">
-                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                   <Zap className="w-4 h-4 text-primary" fill="currentColor" />
-                 </div>
-                 <div>
-                   <p className="text-xs font-bold text-primary mb-0.5">Radar IA de Demanda</p>
-                   <p className="text-sm text-zinc-300 leading-relaxed">{msg.text}</p>
-                 </div>
-              </div>
-            ) : (
-              <div className={`max-w-[75%] rounded-2xl p-3 ${
-                msg.role === 'assistant' 
-                  ? 'bg-zinc-900 border border-white/5 text-zinc-200 rounded-tl-sm' 
-                  : 'bg-primary text-black font-medium rounded-tr-sm'
-              }`}>
-                <p className="text-sm leading-relaxed">{msg.text}</p>
-              </div>
-            )}
+            <div className={`max-w-[80%] rounded-2xl p-3.5 shadow-sm ${
+              msg.role === 'assistant' 
+                ? 'bg-zinc-900 border border-white/5 text-zinc-200 rounded-bl-sm' 
+                : 'bg-primary text-black font-medium rounded-br-sm'
+            }`}>
+              <p className="text-sm leading-relaxed">{msg.text}</p>
+            </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full p-4 bg-zinc-950/80 backdrop-blur-md border-t border-white/5 pb-8">
-        <div className="flex items-center gap-2 relative">
-          <Input 
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ex: Tem promoção agora?..." 
-            className="h-12 bg-zinc-900 border-white/10 rounded-full pl-4 pr-12 text-white focus-visible:ring-primary/50"
-          />
-          <button 
-            onClick={handleSend}
-            className="absolute right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black hover:bg-primary/80 transition-colors"
-          >
-            <Send className="w-4 h-4 ml-[-2px]" />
+      <div className="absolute bottom-0 left-0 w-full bg-zinc-950/95 backdrop-blur-md border-t border-white/5">
+        {/* Quick Actions */}
+        <div className="flex gap-2 overflow-x-auto hide-scrollbar p-3 border-b border-white/5">
+          <button onClick={() => handleQuickAction("Ver promoções")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <Tag className="w-3.5 h-3.5 text-primary" /> Ver promoções
           </button>
+          <button onClick={() => handleQuickAction("Acompanhar pedido")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <MapPin className="w-3.5 h-3.5 text-primary" /> Acompanhar pedido
+          </button>
+          <button onClick={() => handleQuickAction("Como funciona a taxa da porta?")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <Info className="w-3.5 h-3.5 text-primary" /> Taxa de entrega na porta
+          </button>
+          <button onClick={() => handleQuickAction("Restaurantes próximos")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <Search className="w-3.5 h-3.5 text-primary" /> Restaurantes próximos
+          </button>
+          <button onClick={() => handleQuickAction("Falar com suporte")} className="bg-zinc-900 border border-white/10 px-3 py-2 rounded-xl text-xs text-white whitespace-nowrap flex items-center gap-2 hover:bg-zinc-800 transition-colors">
+            <Headset className="w-3.5 h-3.5 text-primary" /> Falar com suporte
+          </button>
+        </div>
+
+        <div className="p-3 pb-8">
+          <div className="flex items-center gap-2 relative">
+            <Input 
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Digite o que precisa..." 
+              className="h-12 bg-zinc-900 border-white/10 rounded-full pl-4 pr-12 text-white focus-visible:ring-primary/50 text-sm"
+            />
+            <button 
+              id="chat-send-btn"
+              onClick={handleSend}
+              className="absolute right-1.5 w-9 h-9 bg-primary rounded-full flex items-center justify-center text-black hover:bg-primary/80 transition-colors"
+            >
+              <Send className="w-4 h-4 ml-[-2px]" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
