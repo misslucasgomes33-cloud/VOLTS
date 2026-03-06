@@ -25,6 +25,7 @@ export default function Register() {
         <div className="space-y-4 flex-1">
           <Input placeholder="Nome completo" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
           <Input type="email" placeholder="E-mail" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
+          <Input type="text" placeholder="CPF" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
           <Input type="tel" placeholder="Telefone / WhatsApp" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
           
           <Select>
@@ -32,8 +33,11 @@ export default function Register() {
               <SelectValue placeholder="Selecione sua cidade" />
             </SelectTrigger>
             <SelectContent className="bg-zinc-900 border-white/10 text-white">
-              <SelectItem value="cuiaba">Cuiabá</SelectItem>
-              <SelectItem value="vg">Várzea Grande</SelectItem>
+              <SelectItem value="cuiaba">Cuiabá (Centro)</SelectItem>
+              <SelectItem value="cuiaba-cpa">Cuiabá (CPA)</SelectItem>
+              <SelectItem value="cuiaba-coxipo">Cuiabá (Coxipó)</SelectItem>
+              <SelectItem value="vg-centro">Várzea Grande (Centro)</SelectItem>
+              <SelectItem value="vg-cristo-rei">Várzea Grande (Cristo Rei)</SelectItem>
             </SelectContent>
           </Select>
 

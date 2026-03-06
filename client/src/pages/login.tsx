@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap } from "lucide-react";
+import { Zap, Store, Bike } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -71,6 +71,20 @@ export default function Login() {
               Criar conta
             </button>
           </div>
+        </div>
+
+        {/* Operational Access Link */}
+        <div className="pt-8 w-full border-t border-white/5">
+          <button 
+            onClick={() => setLocation("/operacional")}
+            className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-white transition-colors"
+          >
+            <div className="flex items-center gap-1">
+              <Store className="w-3 h-3" />
+              <Bike className="w-3 h-3" />
+            </div>
+            Acesso para Restaurantes e Entregadores
+          </button>
         </div>
       </div>
     </div>
