@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
 
 export default function Register() {
@@ -29,17 +29,33 @@ export default function Register() {
           <Input type="tel" placeholder="Telefone / WhatsApp" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
           
           <Select>
-            <SelectTrigger className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50">
-              <SelectValue placeholder="Selecione sua cidade" />
+            <SelectTrigger className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50 text-left">
+              <SelectValue placeholder="Selecione sua cidade e zona" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-white/10 text-white">
-              <SelectItem value="cuiaba">Cuiabá (Centro)</SelectItem>
-              <SelectItem value="cuiaba-cpa">Cuiabá (CPA)</SelectItem>
-              <SelectItem value="cuiaba-coxipo">Cuiabá (Coxipó)</SelectItem>
-              <SelectItem value="vg-centro">Várzea Grande (Centro)</SelectItem>
-              <SelectItem value="vg-cristo-rei">Várzea Grande (Cristo Rei)</SelectItem>
+            <SelectContent className="bg-zinc-900 border-white/10 text-white max-h-[300px]">
+              <SelectGroup>
+                <SelectLabel className="text-primary font-bold">Cuiabá</SelectLabel>
+                <SelectItem value="cba-centro">Centro</SelectItem>
+                <SelectItem value="cba-cpa">CPA</SelectItem>
+                <SelectItem value="cba-santa-rosa">Santa Rosa</SelectItem>
+                <SelectItem value="cba-tres-americas">Três Américas</SelectItem>
+                <SelectItem value="cba-jardim-universitario">Jardim Universitário</SelectItem>
+                <SelectItem value="cba-tijucal">Tijucal</SelectItem>
+                <SelectItem value="cba-jardim-imperial">Jardim Imperial</SelectItem>
+                <SelectItem value="cba-coxipo">Coxipó</SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="text-primary font-bold mt-2">Várzea Grande</SelectLabel>
+                <SelectItem value="vg-centro">Centro</SelectItem>
+                <SelectItem value="vg-cristo-rei">Cristo Rei</SelectItem>
+                <SelectItem value="vg-ponte-nova">Ponte Nova</SelectItem>
+                <SelectItem value="vg-santa-isabel">Santa Isabel</SelectItem>
+                <SelectItem value="vg-sao-matheus">São Matheus</SelectItem>
+                <SelectItem value="vg-imperial-mapim-esperanca">Jd. Imperial / Mapim / Nova Esperança</SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
+          <p className="text-[10px] text-zinc-500 -mt-2 px-1">Esta seleção define os restaurantes disponíveis na sua região.</p>
 
           <Input type="password" placeholder="Senha" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
           <Input type="password" placeholder="Confirmar senha" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
