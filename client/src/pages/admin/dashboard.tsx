@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
@@ -26,6 +26,14 @@ export default function AdminDashboard() {
   const [videoReady, setVideoReady] = useState(false);
   const [template, setTemplate] = useState("launch");
 
+  // AI Chat State
+  const [isListening, setIsListening] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+  const [greeting, setGreeting] = useState("Olá");
+  const [chatHistory, setChatHistory] = useState([
+    { role: 'ai', text: 'Carregando interface de voz...' }
+  ]);
+
   useEffect(() => {
     // get from localStorage or default to adm
     const role = localStorage.getItem('admin_role') || 'adm';
@@ -35,6 +43,18 @@ export default function AdminDashboard() {
     if (role === 'gerencia' && activeTab === 'marketing') {
       setActiveTab('capacity');
     }
+
+    // Set greeting based on time
+    const hour = new Date().getHours();
+    let timeGreeting = "Boa noite";
+    if (hour >= 5 && hour < 12) timeGreeting = "Bom dia";
+    else if (hour >= 12 && hour < 18) timeGreeting = "Boa tarde";
+    
+    setGreeting(`${timeGreeting}, Senhor Lucas!`);
+    setChatHistory([
+      { role: 'ai', text: `${timeGreeting}, Senhor Lucas! Como vai? Sistema operando nominalmente, mas resolvi um travamento na fila do PIX há pouco. Precisa de algo?` }
+    ]);
+
   }, []);
 
   const handleGenerate = () => {
@@ -44,6 +64,39 @@ export default function AdminDashboard() {
       setIsGenerating(false);
       setVideoReady(true);
     }, 2500);
+  };
+
+  const handleSendMessage = () => {
+    if (!chatMessage.trim()) return;
+    
+    const newHistory = [...chatHistory, { role: 'user', text: chatMessage }];
+    setChatHistory(newHistory);
+    setChatMessage("");
+    
+    // Mock AI response
+    setTimeout(() => {
+      let responseText = "Entendido, chefe. Estou monitorando isso de perto.";
+      
+      if (chatMessage.toLowerCase().includes("piada")) {
+        responseText = "Por que o banco de dados foi ao psiquiatra? Porque ele tinha muitos relacionamentos rompidos! 🥁 Ba-dum-tss. Brincadeiras à parte, a latência está em 42ms hoje.";
+      } else if (chatMessage.toLowerCase().includes("problema") || chatMessage.toLowerCase().includes("bug") || chatMessage.toLowerCase().includes("b.o")) {
+        responseText = "Pode deixar comigo. Já zerei a fila fantasma do PIX e bloqueei 3 IPs suspeitos na última hora. O sistema está blindado e voando baixo.";
+      } else if (chatMessage.toLowerCase().includes("relatório")) {
+        responseText = "Tivemos 1.240 pedidos hoje, ticket médio de R$ 42. Sugiro darmos um boost de bônus na região Centro agora no jantar. Devo ativar?";
+      }
+
+      setChatHistory([...newHistory, { role: 'ai', text: responseText }]);
+    }, 1000);
+  };
+
+  const toggleVoice = () => {
+    setIsListening(!isListening);
+    if (!isListening) {
+      setTimeout(() => {
+        setChatMessage("Como estão as vendas hoje?");
+        setIsListening(false);
+      }, 2000);
+    }
   };
 
   return (
@@ -164,20 +217,61 @@ export default function AdminDashboard() {
             </div>
 
             {/* Advisor AI Dashboard */}
-            <div className="bg-gradient-to-br from-indigo-900/20 to-zinc-900 border border-indigo-500/30 rounded-3xl p-5 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-indigo-900/20 to-zinc-900 border border-indigo-500/30 rounded-3xl p-5 relative overflow-hidden flex flex-col">
               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/20 blur-3xl rounded-full" />
-              <div className="relative z-10">
+              <div className="relative z-10 flex-1 flex flex-col h-full">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <BrainCircuit className="w-5 h-5 text-indigo-400" />
-                    <h2 className="text-lg font-bold text-white">IA Advisor (Ação Autônoma)</h2>
+                    <h2 className="text-lg font-bold text-white">Assistente Executivo</h2>
                   </div>
-                  <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-bold border border-indigo-500/30">ANALISANDO</span>
+                  <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-bold border border-indigo-500/30">ONLINE</span>
                 </div>
                 
-                <p className="text-xs text-zinc-300 mb-4">
-                  Analisa dados operacionais, de negócio e relatórios da IA Guardian para sugerir estratégias e resolver falhas de sistema automaticamente.
-                </p>
+                {/* Voice / Chat Interface */}
+                <div className="flex-1 bg-black/40 border border-white/5 rounded-2xl p-4 mb-4 flex flex-col">
+                  <div className="flex-1 overflow-y-auto space-y-3 mb-4 hide-scrollbar min-h-[150px] max-h-[200px]">
+                    {chatHistory.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+                          msg.role === 'user' 
+                            ? 'bg-primary text-black font-medium rounded-tr-sm' 
+                            : 'bg-zinc-800 text-zinc-200 border border-white/10 rounded-tl-sm'
+                        }`}>
+                          {msg.role === 'ai' && <Bot className="w-3 h-3 text-indigo-400 inline-block mr-1.5 -mt-0.5" />}
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="relative mt-auto">
+                    <input 
+                      type="text" 
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                      placeholder="Fale comigo ou digite aqui..."
+                      className="w-full bg-zinc-900 border border-white/10 rounded-full pl-4 pr-24 py-3 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                    />
+                    <div className="absolute right-1 top-1 flex gap-1">
+                      <button 
+                        onClick={toggleVoice}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                          isListening ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        <Mic className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={handleSendMessage}
+                        className="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition-colors"
+                      >
+                        <Send className="w-3.5 h-3.5 -ml-0.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 
                 <div className="space-y-3">
 
