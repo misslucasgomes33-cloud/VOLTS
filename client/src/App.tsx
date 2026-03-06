@@ -17,11 +17,11 @@ import BottomNav from "@/components/layout/bottom-nav";
 
 function Router() {
   const [location] = useLocation();
-  const isAuthRoute = ['/login', '/register', '/recovery'].includes(location);
+  const isAuthRoute = ['/', '/login', '/register', '/recovery'].includes(location);
 
   return (
     <div className="mobile-container">
-      <div className="flex-1 overflow-y-auto hide-scrollbar pb-20">
+      <div className={`flex-1 overflow-y-auto hide-scrollbar ${!isAuthRoute ? 'pb-20' : ''}`}>
         <Switch>
           <Route path="/" component={Login} />
           <Route path="/login" component={Login} />
