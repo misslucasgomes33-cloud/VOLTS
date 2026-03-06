@@ -82,10 +82,32 @@ export default function PartnerDashboard() {
               </div>
               <div className="relative z-10">
                 <h4 className="text-xs font-bold text-yellow-500 uppercase tracking-wider mb-1">IA VOLTS PRO</h4>
-                <p className="text-xs text-zinc-300 leading-relaxed">
-                  Notei uma queda de 15% nas vendas de bebidas hoje. Sugiro ativar o "Combo Burger + Coca" com 10% de desconto para as próximas 2 horas.
+                <p className="text-xs text-zinc-300 leading-relaxed mb-2">
+                  Previsão de <strong>alta demanda</strong> na sua região às 19:30. Sugiro ativar o "Combo Burger + Coca" com 10% de desconto para atrair os clientes que estão abrindo o app agora.
                 </p>
-                <Button size="sm" className="mt-2 h-7 text-[10px] bg-yellow-500 hover:bg-yellow-400 text-black font-bold">Ativar Combo Agora</Button>
+                <Button size="sm" className="h-7 text-[10px] bg-yellow-500 hover:bg-yellow-400 text-black font-bold">Ativar Promoção Sugerida</Button>
+              </div>
+            </div>
+
+            {/* Partner Mission */}
+            <div className="bg-zinc-900 border border-white/5 rounded-2xl p-4 mb-6 relative overflow-hidden">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-blue-500" /> Desafio de Performance
+                </h4>
+                <span className="text-xs font-bold text-blue-400">-2% na Taxa Hoje</span>
+              </div>
+              <p className="text-xs text-zinc-400 mb-3">
+                Aceite os próximos 10 pedidos em menos de 1 minuto e reduza sua comissão para 8% até o fim do dia!
+              </p>
+              <div className="space-y-1">
+                <div className="flex justify-between text-[10px] text-zinc-400 font-bold mb-1">
+                  <span>Pedidos Aceitos Rápido</span>
+                  <span className="text-blue-500">6 / 10</span>
+                </div>
+                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: '60%' }}></div>
+                </div>
               </div>
             </div>
 

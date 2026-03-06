@@ -65,7 +65,7 @@ export default function Home() {
 
       {/* Dynamic AI Alert */}
       <div className="px-5 mt-4">
-        <div onClick={() => setLocation('/chat')} className="cursor-pointer bg-gradient-to-r from-zinc-900 to-zinc-800 border border-primary/20 rounded-2xl p-4 flex gap-4 items-start relative overflow-hidden group hover:border-primary/40 transition-all">
+        <div onClick={() => setLocation('/chat')} className="cursor-pointer bg-gradient-to-r from-zinc-900 to-zinc-800 border border-primary/20 rounded-2xl p-4 flex gap-4 items-start relative overflow-hidden group hover:border-primary/40 transition-all mb-4">
           <div className="absolute right-0 top-0 w-32 h-32 bg-primary/10 blur-2xl rounded-full" />
           <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0 border border-primary/30">
             <Bot className="w-5 h-5 text-primary" />
@@ -81,6 +81,28 @@ export default function Home() {
             <p className="text-sm text-zinc-300 leading-snug font-medium">
               A demanda está alta, mas nossos entregadores são rápidos! <strong className="text-white">Toque aqui</strong> para cupons relâmpago.
             </p>
+          </div>
+        </div>
+
+        {/* Customer Mission */}
+        <div className="bg-zinc-900 border border-white/5 rounded-2xl p-4 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="font-bold text-sm text-white flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" /> Desafio da Semana
+            </h4>
+            <span className="text-xs font-bold text-primary">R$ 15 Cashback</span>
+          </div>
+          <div className="space-y-2 relative z-10">
+            <p className="text-xs text-zinc-400">
+              Faça 3 pedidos acima de R$ 40 em Restaurantes diferentes e ganhe R$ 15 na carteira!
+            </p>
+            <div className="flex justify-between text-[10px] text-zinc-500 font-bold mb-1">
+              <span>Progresso</span>
+              <span className="text-primary">1 / 3 pedidos</span>
+            </div>
+            <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full" style={{ width: '33%' }}></div>
+            </div>
           </div>
         </div>
       </div>
