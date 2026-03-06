@@ -9,11 +9,11 @@ import promoVideo from '@/assets/videos/promo-volts.mp4';
 
 // Mock data for zones capacity
 const zoneCapacity = [
-  { id: 1, name: "Cristo Rei / Ponte Nova / Aeroporto", type: "driver", max: 12, current: 12, city: "Várzea Grande", waitlist: 3 },
-  { id: 2, name: "São Matheus / Paiaguás", type: "driver", max: 6, current: 4, city: "Várzea Grande", waitlist: 0 },
-  { id: 3, name: "Mapim / Nova Esperança / Jd Imperial", type: "driver", max: 8, current: 8, city: "Várzea Grande", waitlist: 5 },
-  { id: 4, name: "Centro / CPA / Santa Rosa", type: "driver", max: 20, current: 15, city: "Cuiabá", waitlist: 0 },
-  { id: 5, name: "Coxipó / Tijucal", type: "driver", max: 15, current: 15, city: "Cuiabá", waitlist: 8 },
+  { id: 1, name: "Cristo Rei / Ponte Nova / Aeroporto", type: "driver", max: 15, current: 15, city: "Várzea Grande", waitlist: 3 },
+  { id: 2, name: "São Matheus / Paiaguás", type: "driver", max: 10, current: 8, city: "Várzea Grande", waitlist: 0 },
+  { id: 3, name: "Jd Glória / Mapim / Nova Esperança / Cohab Michel / Jacarandá", type: "driver", max: 15, current: 15, city: "Várzea Grande", waitlist: 5 },
+  { id: 4, name: "Centro / CPA / Santa Rosa", type: "driver", max: 15, current: 15, city: "Cuiabá", waitlist: 0 },
+  { id: 5, name: "Coxipó / Tijucal", type: "driver", max: 10, current: 10, city: "Cuiabá", waitlist: 8 },
 ];
 
 export default function AdminDashboard() {
@@ -172,9 +172,24 @@ export default function AdminDashboard() {
               <div>
                 <h4 className="text-sm font-bold text-primary mb-1">Alerta IA de Demanda</h4>
                 <p className="text-xs text-zinc-300 leading-relaxed">
-                  A região <strong>Coxipó / Tijucal</strong> está com fila de espera (8 entregadores), mas a demanda de restaurantes lá cresceu 40%. Sugiro aumentar o limite em +5 vagas hoje.
+                  A região <strong>Coxipó / Tijucal</strong> está com fila de espera (8 entregadores), mas a demanda de restaurantes lá cresceu 40%. O sistema automaticamente chamou +2 entregadores aprovados da lista para a escala de hoje.
                 </p>
-                <Button size="sm" className="mt-3 h-8 bg-zinc-800 text-white hover:bg-zinc-700 font-bold border border-white/10">Aumentar Limite Automaticamente</Button>
+                <div className="flex gap-2 mt-3">
+                  <Button size="sm" className="h-8 bg-primary hover:bg-primary/90 text-black font-bold flex-1">Ver Escala</Button>
+                  <Button size="sm" variant="outline" className="h-8 border-white/10 text-white flex-1">Ver Lista</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-3 mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <ShieldAlert className="w-4 h-4 text-blue-500" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white">Privilégio Admin Ativo</h4>
+                  <p className="text-[10px] text-zinc-400">Você pode aceitar entregas em qualquer zona sem restrição de vagas.</p>
+                </div>
               </div>
             </div>
 
@@ -237,12 +252,22 @@ export default function AdminDashboard() {
   );
 }
 
-// Inline CheckCircle2 component
+// Inline checkcircle and shieldalert components
 function CheckCircle2({ className }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round" className={className}>
       <circle cx="12" cy="12" r="10"/>
       <path d="m9 12 2 2 4-4"/>
+    </svg>
+  );
+}
+
+function ShieldAlert({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round" className={className}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+      <path d="M12 8v4"/>
+      <path d="M12 16h.01"/>
     </svg>
   );
 }
