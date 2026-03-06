@@ -22,6 +22,9 @@ import OpLogin from "@/pages/operacional/login";
 import DriverDashboard from "@/pages/operacional/driver-dashboard";
 import PartnerDashboard from "@/pages/operacional/partner-dashboard";
 
+// Admin Pages
+import AdminDashboard from "@/pages/admin/dashboard";
+
 import BottomNav from "@/components/layout/bottom-nav";
 
 function Router() {
@@ -32,9 +35,10 @@ function Router() {
   
   // Operational routes check
   const isOpRoute = location.startsWith('/operacional');
+  const isAdminRoute = location.startsWith('/admin');
 
-  // Do not show bottom nav or bot button on auth, chat, or operational routes
-  const hideClientNav = isAuthRoute || isChatRoute || isOpRoute;
+  // Do not show bottom nav or bot button on auth, chat, or operational/admin routes
+  const hideClientNav = isAuthRoute || isChatRoute || isOpRoute || isAdminRoute;
 
   return (
     <div className="mobile-container">
@@ -56,6 +60,9 @@ function Router() {
           <Route path="/operacional" component={OpLogin} />
           <Route path="/operacional/motorista" component={DriverDashboard} />
           <Route path="/operacional/parceiro" component={PartnerDashboard} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" component={AdminDashboard} />
           
           <Route component={NotFound} />
         </Switch>
