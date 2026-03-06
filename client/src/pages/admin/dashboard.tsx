@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send } from "lucide-react";
+import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send, Map as MapIcon, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
+import MapComponent from "@/components/MapComponent";
 
 // Import the generated video
 import promoVideo from '@/assets/videos/promo-volts.mp4';
@@ -18,7 +19,7 @@ const zoneCapacity = [
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState('ai'); // 'ai', 'marketing' or 'capacity'
+  const [activeTab, setActiveTab] = useState('ai'); // 'ai', 'marketing', 'capacity', or 'map'
   const [adminRole, setAdminRole] = useState('adm'); // adm or gerencia
   
   // Marketing State
@@ -162,6 +163,12 @@ export default function AdminDashboard() {
             className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'capacity' ? 'bg-primary text-black shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
             <Users className="w-3.5 h-3.5" /> Vagas / Zonas
+          </button>
+          <button 
+            onClick={() => setActiveTab('map')}
+            className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'map' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          >
+            <MapIcon className="w-3.5 h-3.5" /> Mapa ao Vivo
           </button>
         </div>
       </div>
@@ -525,6 +532,65 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+        {activeTab === 'map' && (
+          <div className="animate-in fade-in duration-300">
+            <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 mb-6 flex flex-col h-[600px]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <MapIcon className="w-5 h-5 text-emerald-400" />
+                  <h2 className="text-lg font-bold text-white">Radar ao Vivo</h2>
+                </div>
+                <div className="flex items-center gap-2 text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  125 Entregadores Online
+                </div>
+              </div>
+              
+              <div className="flex-1 bg-black rounded-2xl overflow-hidden border border-white/5 relative">
+                <MapComponent />
+                
+                {/* Overlay Panel */}
+                <div className="absolute top-4 left-4 right-4 bg-zinc-950/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 z-10 flex gap-4 overflow-x-auto hide-scrollbar">
+                  <div className="flex items-center gap-2 min-w-max">
+                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <span className="text-xs text-zinc-300">Motoristas (82)</span>
+                  </div>
+                  <div className="flex items-center gap-2 min-w-max">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="text-xs text-zinc-300">Restaurantes (45)</span>
+                  </div>
+                  <div className="flex items-center gap-2 min-w-max">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <span className="text-xs text-zinc-300">Clientes Ativos</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-black/30 border border-white/5 rounded-xl p-3">
+                  <p className="text-[10px] text-zinc-500 mb-1">Entregas em Andamento</p>
+                  <p className="text-lg font-bold text-white">48</p>
+                </div>
+                <div className="bg-black/30 border border-white/5 rounded-xl p-3">
+                  <p className="text-[10px] text-zinc-500 mb-1">Tempo Médio (Viagem)</p>
+                  <p className="text-lg font-bold text-white">12m 30s</p>
+                </div>
+                <div className="bg-black/30 border border-white/5 rounded-xl p-3">
+                  <p className="text-[10px] text-zinc-500 mb-1">Zonas em Alerta</p>
+                  <p className="text-lg font-bold text-red-400">2</p>
+                </div>
+                <div className="bg-black/30 border border-white/5 rounded-xl p-3">
+                  <p className="text-[10px] text-zinc-500 mb-1">Eficiência da Rede</p>
+                  <p className="text-lg font-bold text-emerald-400">94%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
