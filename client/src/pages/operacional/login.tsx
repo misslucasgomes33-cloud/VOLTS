@@ -64,7 +64,7 @@ export default function OpLogin() {
                   </div>
                   <div className="text-left">
                     <span className="block font-bold text-white text-base">Painel Admin</span>
-                    <span className="block text-[10px] text-zinc-500">Marketing & Gestão</span>
+                    <span className="block text-[10px] text-zinc-500">Marketing & Vagas</span>
                   </div>
                 </div>
                 <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-purple-500 transition-colors" />
