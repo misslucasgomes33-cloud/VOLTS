@@ -1,4 +1,4 @@
-import { Search, MapPin, Zap, Star, ChevronRight, Bot, TrendingDown } from "lucide-react";
+import { Search, MapPin, Zap, Star, ChevronRight, Bot, TrendingDown, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,21 +6,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import burgerImg from '@/assets/burger.png';
 import pizzaImg from '@/assets/pizza.png';
 import acaiImg from '@/assets/acai.png';
+import bannerImg from '@/assets/banner.png';
+import meatImg from '@/assets/meat.png';
+import drinksImg from '@/assets/drinks.png';
+import pharmacyImg from '@/assets/pharmacy.png';
 
 const categories = [
-  { id: 1, name: "Restaurantes", icon: "🍽️" },
-  { id: 2, name: "Açaí/Sorveteria", icon: "🍧" },
-  { id: 3, name: "Açougue", icon: "🥩" },
-  { id: 4, name: "Bebidas", icon: "🍻" },
-  { id: 5, name: "Farmácia", icon: "💊" },
-  { id: 6, name: "Pet Shop", icon: "🐾" },
-  { id: 7, name: "Variedades", icon: "🛍️" },
+  { id: 1, name: "Restaurantes", icon: "🍔", image: burgerImg },
+  { id: 2, name: "Mercado", icon: "🛒", image: meatImg },
+  { id: 3, name: "Açaí", icon: "🍧", image: acaiImg },
+  { id: 4, name: "Açougue", icon: "🥩", image: meatImg },
+  { id: 5, name: "Bebidas", icon: "🍻", image: drinksImg },
+  { id: 6, name: "Farmácia", icon: "💊", image: pharmacyImg },
 ];
 
 const recommended = [
   { id: 1, name: "Volt Burger", rating: 4.9, time: "15-25 min", fee: "R$ 4,99", image: burgerImg, tags: ["Lanches", "Premium"] },
   { id: 2, name: "Pizza Express", rating: 4.7, time: "30-40 min", fee: "Grátis", image: pizzaImg, tags: ["Pizza", "Italiana"] },
   { id: 3, name: "Açaí Energy", rating: 4.8, time: "10-20 min", fee: "R$ 2,99", image: acaiImg, tags: ["Doces", "Açaí"] },
+];
+
+const banners = [
+  { id: 1, image: bannerImg, title: "Ofertas Relâmpago", subtitle: "Até 50% OFF" }
 ];
 
 export default function Home() {
@@ -41,52 +48,68 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-full border border-primary/20">
+          <div className="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-full border border-primary/20 cursor-pointer hover:bg-zinc-800 transition-colors">
             <Zap className="w-3.5 h-3.5 text-primary" fill="currentColor" />
-            <span className="text-xs font-bold text-primary">VIP</span>
+            <span className="text-xs font-bold text-primary">Seja VIP</span>
           </div>
         </div>
 
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input 
-            placeholder="O que você quer pedir hoje?" 
-            className="pl-12 h-12 bg-zinc-900 border-white/5 rounded-2xl text-white focus-visible:ring-primary/30 shadow-inner"
+            placeholder="Comida, mercado, farmácia..." 
+            className="pl-12 h-12 bg-zinc-900 border-white/5 rounded-2xl text-white focus-visible:ring-primary/30 shadow-inner text-base"
           />
         </div>
       </div>
 
       {/* Dynamic AI Alert */}
       <div className="px-5 mt-4">
-        <div onClick={() => setLocation('/chat')} className="cursor-pointer bg-primary/10 border border-primary/20 rounded-2xl p-4 flex gap-4 items-start relative overflow-hidden group hover:bg-primary/15 transition-colors">
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/20 blur-2xl rounded-full" />
-          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
+        <div onClick={() => setLocation('/chat')} className="cursor-pointer bg-gradient-to-r from-zinc-900 to-zinc-800 border border-primary/20 rounded-2xl p-4 flex gap-4 items-start relative overflow-hidden group hover:border-primary/40 transition-all">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-primary/10 blur-2xl rounded-full" />
+          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0 border border-primary/30">
             <Bot className="w-5 h-5 text-primary" />
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-xs font-bold text-primary uppercase tracking-wider">Radar IA Ativo</span>
+              <span className="text-xs font-bold text-primary uppercase tracking-wider">Assistente VOLTS</span>
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
             </div>
-            <p className="text-sm text-zinc-300 leading-snug">
-              Demanda alta identificada no Centro. Acabei de direcionar +20 entregadores. <strong className="text-white">Aproveite 15% OFF</strong> em Açaí para balancear o fluxo!
+            <p className="text-sm text-zinc-300 leading-snug font-medium">
+              A demanda está alta, mas nossos entregadores são rápidos! <strong className="text-white">Toque aqui</strong> para cupons relâmpago.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Categories Horizontal Scroll */}
+      {/* Hero Banner */}
       <div className="px-5 mt-6">
-        <div className="flex overflow-x-auto hide-scrollbar gap-4 pb-4">
+        <div className="relative h-36 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+          <img src={bannerImg} alt="Banner" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center p-5">
+            <h2 className="text-white font-display font-black text-2xl uppercase italic tracking-wider">Entrega<br/><span className="text-primary">Na Velocidade da Luz</span></h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Categories Grid */}
+      <div className="px-5 mt-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold text-white">Categorias</h2>
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {categories.map((cat) => (
-            <div key={cat.id} className="flex flex-col items-center gap-2 min-w-[72px]">
-              <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center text-2xl border border-white/5 shadow-sm hover:border-primary/50 transition-colors">
-                {cat.icon}
+            <div key={cat.id} className="flex flex-col items-center gap-2 group cursor-pointer">
+              <div className="w-full aspect-square rounded-2xl bg-zinc-900 border border-white/5 overflow-hidden relative shadow-sm group-hover:border-primary/50 transition-colors">
+                <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
+                <div className="absolute inset-0 flex items-center justify-center text-3xl z-10 drop-shadow-md">
+                  {cat.icon}
+                </div>
               </div>
-              <span className="text-[11px] font-medium text-center leading-tight text-zinc-400">
+              <span className="text-[11px] font-medium text-center text-zinc-300 group-hover:text-primary transition-colors">
                 {cat.name}
               </span>
             </div>
@@ -94,54 +117,48 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Banner */}
-      <div className="px-5 mt-2">
-        <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-2xl p-5 border border-white/5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-1/2 h-full bg-primary/20 blur-3xl rounded-full" />
-          <div className="relative z-10">
-            <h3 className="text-white font-display font-bold text-xl mb-1">Volts <span className="text-primary">VIP</span></h3>
-            <p className="text-zinc-400 text-xs mb-3 max-w-[60%]">Entrega grátis e descontos exclusivos por R$ 24,99/mês.</p>
-            <button className="bg-primary text-black text-xs font-bold px-4 py-2 rounded-lg">
-              Assinar agora
-            </button>
-          </div>
-          <Zap className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 text-primary opacity-20 rotate-12" fill="currentColor" />
-        </div>
-      </div>
-
       {/* Recommended list */}
-      <div className="px-5 mt-8 mb-6">
+      <div className="px-5 mt-10 mb-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-display font-bold text-white flex items-center gap-2">
-            Recomendados pela IA <TrendingDown className="w-4 h-4 text-green-500" />
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            Lojas em Destaque <Zap className="w-4 h-4 text-primary" fill="currentColor" />
           </h2>
-          <span className="text-xs text-primary font-medium">Ver todos</span>
+          <span className="text-xs text-primary font-medium hover:underline cursor-pointer">Ver todos</span>
         </div>
 
         <div className="flex flex-col gap-4">
           {recommended.map((item) => (
-            <Card key={item.id} className="bg-zinc-900 border-white/5 overflow-hidden group hover:border-primary/30 transition-colors cursor-pointer">
-              <CardContent className="p-0 flex h-28">
-                <div className="w-28 h-full relative shrink-0">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+            <Card key={item.id} className="bg-zinc-900/50 border-white/5 overflow-hidden group hover:bg-zinc-900 hover:border-primary/30 transition-all cursor-pointer">
+              <CardContent className="p-0">
+                <div className="w-full h-36 relative overflow-hidden">
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+                  <div className="absolute top-3 right-3 bg-zinc-900/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 border border-white/10">
+                    <Clock className="w-3 h-3 text-primary" />
+                    <span className="text-[10px] font-bold text-white">{item.time}</span>
+                  </div>
                 </div>
-                <div className="p-3 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-white text-base">{item.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center gap-1 bg-zinc-950 px-1.5 py-0.5 rounded text-[10px] font-medium text-primary">
-                        <Star className="w-3 h-3" fill="currentColor" />
-                        {item.rating}
-                      </div>
-                      <span className="text-xs text-zinc-500">•</span>
-                      <span className="text-xs text-zinc-400">{item.tags[0]}</span>
+                <div className="p-4 -mt-6 relative z-10">
+                  <div className="flex justify-between items-end mb-2">
+                    <h3 className="font-display font-bold text-white text-lg tracking-tight">{item.name}</h3>
+                    <div className="flex items-center gap-1 bg-zinc-900 px-2 py-1 rounded-lg border border-primary/20 shadow-[0_0_10px_rgba(255,204,0,0.1)]">
+                      <Star className="w-3.5 h-3.5 text-primary" fill="currentColor" />
+                      <span className="text-xs font-bold text-primary">{item.rating}</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-zinc-400">{item.time}</span>
-                    <span className={item.fee === "Grátis" ? "text-xs font-semibold text-primary" : "text-xs text-zinc-400"}>
-                      {item.fee === "Grátis" ? "Entrega Grátis" : item.fee}
+                  
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-md">{item.tags[0]}</span>
+                    <span className="text-xs text-zinc-500">•</span>
+                    <span className="text-xs text-zinc-400">{item.tags[1]}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                    <span className="text-xs text-zinc-400 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" /> Distância: 2.5km
+                    </span>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${item.fee === "Grátis" ? "bg-primary/10 text-primary border border-primary/20" : "bg-zinc-800 text-zinc-300"}`}>
+                      {item.fee === "Grátis" ? "Entrega Grátis" : `Taxa ${item.fee}`}
                     </span>
                   </div>
                 </div>
