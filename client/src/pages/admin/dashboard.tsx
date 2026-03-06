@@ -50,20 +50,42 @@ export default function AdminDashboard() {
     if (hour >= 5 && hour < 12) timeGreeting = "Bom dia";
     else if (hour >= 12 && hour < 18) timeGreeting = "Boa tarde";
     
+    const initialGreeting = `${timeGreeting}, Senhor Lucas! Como vai? O sistema está operando nominalmente, mas resolvi um travamento na fila do PIX há pouco. Precisa de algo?`;
+    
     setGreeting(`${timeGreeting}, Senhor Lucas!`);
     setChatHistory([
-      { role: 'ai', text: `${timeGreeting}, Senhor Lucas! Como vai? Sistema operando nominalmente, mas resolvi um travamento na fila do PIX há pouco. Precisa de algo?` }
+      { role: 'ai', text: initialGreeting }
     ]);
+
+    // Speak initial greeting
+    speakText(initialGreeting);
 
   }, []);
 
-  const handleGenerate = () => {
-    setIsGenerating(true);
-    // Simulate generation time
-    setTimeout(() => {
-      setIsGenerating(false);
-      setVideoReady(true);
-    }, 2500);
+  const speakText = (text: string) => {
+    if (!window.speechSynthesis) return;
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    
+    // Try to find a female voice
+    const voices = window.speechSynthesis.getVoices();
+    const femaleVoice = voices.find(voice => 
+      voice.lang.includes('pt-BR') && 
+      (voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('luciana') || voice.name.toLowerCase().includes('maria') || voice.name.toLowerCase().includes('zira'))
+    ) || voices.find(voice => voice.lang.includes('pt-BR'));
+    
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+    
+    utterance.rate = 1.0;
+    utterance.pitch = 1.1; // Slightly higher pitch for female feel if generic voice
+    
+    window.speechSynthesis.speak(utterance);
   };
 
   const handleSendMessage = () => {
@@ -78,14 +100,15 @@ export default function AdminDashboard() {
       let responseText = "Entendido, chefe. Estou monitorando isso de perto.";
       
       if (chatMessage.toLowerCase().includes("piada")) {
-        responseText = "Por que o banco de dados foi ao psiquiatra? Porque ele tinha muitos relacionamentos rompidos! 🥁 Ba-dum-tss. Brincadeiras à parte, a latência está em 42ms hoje.";
-      } else if (chatMessage.toLowerCase().includes("problema") || chatMessage.toLowerCase().includes("bug") || chatMessage.toLowerCase().includes("b.o")) {
-        responseText = "Pode deixar comigo. Já zerei a fila fantasma do PIX e bloqueei 3 IPs suspeitos na última hora. O sistema está blindado e voando baixo.";
-      } else if (chatMessage.toLowerCase().includes("relatório")) {
-        responseText = "Tivemos 1.240 pedidos hoje, ticket médio de R$ 42. Sugiro darmos um boost de bônus na região Centro agora no jantar. Devo ativar?";
+        responseText = "Por que o banco de dados foi ao psiquiatra? Porque ele tinha muitos relacionamentos rompidos! 🥁 Ba-dum-tss. Brincadeiras à parte, a latência está em 42 milissegundos hoje.";
+      } else if (chatMessage.toLowerCase().includes("problema") || chatMessage.toLowerCase().includes("bug") || chatMessage.toLowerCase().includes("b.o") || chatMessage.toLowerCase().includes("erro") || chatMessage.toLowerCase().includes("resolver")) {
+        responseText = "Pode deixar comigo. Já zerei a fila fantasma do PIX, reiniciei o gateway de pagamentos e bloqueei 3 IPs suspeitos de fraude na última hora. O sistema está blindado e voando baixo.";
+      } else if (chatMessage.toLowerCase().includes("relatório") || chatMessage.toLowerCase().includes("status") || chatMessage.toLowerCase().includes("vendas")) {
+        responseText = "Tivemos 1.240 pedidos hoje, com ticket médio de R$ 42. A região do Coxipó está com alta demanda mas poucos entregadores. Sugiro darmos um bônus dinâmico na região Centro agora no jantar. Devo ativar a campanha?";
       }
 
       setChatHistory([...newHistory, { role: 'ai', text: responseText }]);
+      speakText(responseText);
     }, 1000);
   };
 
