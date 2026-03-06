@@ -52,33 +52,7 @@ export default function OpLogin() {
             </div>
             <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-primary transition-colors" />
           </Button>
-          
-          <div className="pt-4 mt-4 border-t border-white/5">
-             <Button 
-                onClick={() => setLocation('/admin')}
-                className="w-full h-16 bg-zinc-950 hover:bg-zinc-900 border border-purple-500/30 text-white rounded-2xl flex items-center justify-between px-6 group transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-                    <Video className="w-5 h-5 text-purple-500" />
-                  </div>
-                  <div className="text-left">
-                    <span className="block font-bold text-white text-base">Painel Admin</span>
-                    <span className="block text-[10px] text-zinc-500">Marketing & Vagas</span>
-                  </div>
-                </div>
-                <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-purple-500 transition-colors" />
-              </Button>
-          </div>
         </div>
-      </div>
-
-      <div className="text-center pb-8">
-        <Link href="/login">
-          <span className="text-sm text-zinc-500 hover:text-white cursor-pointer transition-colors">
-            Voltar para app do Cliente
-          </span>
-        </Link>
       </div>
     </div>
   );

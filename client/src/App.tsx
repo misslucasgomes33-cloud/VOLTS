@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import { Bot } from "lucide-react";
 
 // Client Pages
+import Portal from "@/pages/portal";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Recovery from "@/pages/recovery";
@@ -30,7 +31,8 @@ import BottomNav from "@/components/layout/bottom-nav";
 function Router() {
   const [location, setLocation] = useLocation();
   
-  const isAuthRoute = location === '/' || location.startsWith('/login') || location.startsWith('/register') || location.startsWith('/recovery');
+  const isPortalRoute = location === '/';
+  const isAuthRoute = location.startsWith('/login') || location.startsWith('/register') || location.startsWith('/recovery');
   const isChatRoute = location === '/chat';
   
   // Operational routes check
@@ -38,14 +40,16 @@ function Router() {
   const isAdminRoute = location.startsWith('/admin');
 
   // Do not show bottom nav or bot button on auth, chat, or operational/admin routes
-  const hideClientNav = isAuthRoute || isChatRoute || isOpRoute || isAdminRoute;
+  const hideClientNav = isPortalRoute || isAuthRoute || isChatRoute || isOpRoute || isAdminRoute;
 
   return (
     <div className="mobile-container">
       <div className={`flex-1 overflow-y-auto hide-scrollbar ${!hideClientNav ? 'pb-20' : ''}`}>
         <Switch>
+          {/* App Launcher / Portal */}
+          <Route path="/" component={Portal} />
+          
           {/* Client Routes */}
-          <Route path="/" component={Login} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/recovery" component={Recovery} />
