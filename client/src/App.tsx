@@ -24,6 +24,7 @@ import DriverDashboard from "@/pages/operacional/driver-dashboard";
 import PartnerDashboard from "@/pages/operacional/partner-dashboard";
 
 // Admin Pages
+import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 
 import BottomNav from "@/components/layout/bottom-nav";
@@ -66,7 +67,8 @@ function Router() {
           <Route path="/operacional/parceiro" component={PartnerDashboard} />
           
           {/* Admin Routes */}
-          <Route path="/admin" component={AdminDashboard} />
+          <Route path="/admin" component={AdminLogin} />
+          <Route path="/admin/dashboard" component={AdminDashboard} />
           
           <Route component={NotFound} />
         </Switch>

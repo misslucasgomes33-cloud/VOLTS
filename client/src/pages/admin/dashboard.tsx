@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
@@ -18,12 +18,24 @@ const zoneCapacity = [
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState('marketing'); // 'marketing' or 'capacity'
+  const [activeTab, setActiveTab] = useState('ai'); // 'ai', 'marketing' or 'capacity'
+  const [adminRole, setAdminRole] = useState('adm'); // adm or gerencia
   
   // Marketing State
   const [isGenerating, setIsGenerating] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [template, setTemplate] = useState("launch");
+
+  useEffect(() => {
+    // get from localStorage or default to adm
+    const role = localStorage.getItem('admin_role') || 'adm';
+    setAdminRole(role);
+    
+    // Gerência doesn't have access to marketing by default in this prototype
+    if (role === 'gerencia' && activeTab === 'marketing') {
+      setActiveTab('capacity');
+    }
+  }, []);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -39,26 +51,39 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="bg-zinc-950 px-5 pt-8 pb-4 sticky top-0 z-40 border-b border-white/5">
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => setLocation("/operacional")} className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-white/5 text-white shrink-0">
+          <button onClick={() => setLocation("/admin")} className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-white/5 text-white shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-display font-black text-white">Admin VOLTS</h1>
-            <p className="text-xs text-zinc-400">Marketing & Operações</p>
+            <h1 className="text-xl font-display font-black text-white flex items-center gap-2">
+              Painel VOLTS
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${adminRole === 'adm' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                {adminRole === 'adm' ? 'ADM' : 'Gerência'}
+              </span>
+            </h1>
+            <p className="text-xs text-zinc-400">Controle Operacional & Inteligência</p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-2 bg-zinc-900/50 p-1 rounded-xl">
+        <div className="flex gap-2 bg-zinc-900/50 p-1 rounded-xl overflow-x-auto hide-scrollbar">
           <button 
-            onClick={() => setActiveTab('marketing')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'marketing' ? 'bg-purple-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+            onClick={() => setActiveTab('ai')}
+            className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'ai' ? 'bg-cyan-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
-            <Video className="w-3.5 h-3.5" /> Criativos IA
+            <BrainCircuit className="w-3.5 h-3.5" /> Monitor IA
           </button>
+          {adminRole === 'adm' && (
+            <button 
+              onClick={() => setActiveTab('marketing')}
+              className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'marketing' ? 'bg-purple-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              <Video className="w-3.5 h-3.5" /> Criativos
+            </button>
+          )}
           <button 
             onClick={() => setActiveTab('capacity')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${activeTab === 'capacity' ? 'bg-primary text-black shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+            className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'capacity' ? 'bg-primary text-black shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
             <Users className="w-3.5 h-3.5" /> Vagas / Zonas
           </button>
@@ -66,7 +91,151 @@ export default function AdminDashboard() {
       </div>
 
       <div className="p-5">
-        {activeTab === 'marketing' ? (
+        {activeTab === 'ai' && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            
+            {/* Guardian AI Report */}
+            <div className="bg-gradient-to-br from-cyan-900/20 to-zinc-900 border border-cyan-500/30 rounded-3xl p-5 relative overflow-hidden">
+              <div className="absolute -left-10 -top-10 w-40 h-40 bg-cyan-500/20 blur-3xl rounded-full" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-cyan-400" />
+                    <h2 className="text-lg font-bold text-white">IA Guardian (Vigilância)</h2>
+                  </div>
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                  </span>
+                </div>
+                
+                <p className="text-xs text-zinc-300 mb-4">
+                  Monitoramento contínuo do sistema. Identifica falhas, tentativas de fraude, duplicidade de contas e anomalias operacionais. Relatórios em tempo real.
+                </p>
+
+                <div className="space-y-3">
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                      <span className="text-xs font-bold text-red-500 uppercase">Fraude Bloqueada</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-300 leading-relaxed">
+                      Detectadas 3 contas de clientes usando o mesmo dispositivo (IMEI: A7X...). Ação: Contas suspensas e IPs bloqueados.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Activity className="w-3.5 h-3.5 text-amber-500" />
+                      <span className="text-xs font-bold text-amber-500 uppercase">Alerta Operacional</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-300 leading-relaxed">
+                      Motorista "Marcos T." com GPS inconsistente ou simulado. Tempo de entrega 40% acima da média na região do Cristo Rei. Conta pausada para análise.
+                    </p>
+                  </div>
+
+                  <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <ShieldAlert className="w-3.5 h-3.5 text-orange-500" />
+                      <span className="text-xs font-bold text-orange-500 uppercase">Falha de Sistema Detectada</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-300 leading-relaxed">
+                      O serviço de pagamentos via PIX retornou erro (TimeOut) 15 vezes nos últimos 2 minutos. Fila de processos engarrafada.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Cpu className="w-3.5 h-3.5 text-green-500" />
+                      <span className="text-xs font-bold text-green-500 uppercase">Saúde do Servidor</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-300 leading-relaxed">
+                      Carga do servidor estável (42%). Nenhuma anomalia de rede. Banco de dados sincronizado e backup diário OK.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex justify-end">
+                  <span className="text-[9px] text-cyan-500 flex items-center gap-1 font-mono bg-cyan-950 px-2 py-1 rounded-full border border-cyan-500/20">
+                    <ArrowRight className="w-3 h-3" /> ENVIANDO RELATÓRIO PARA IA ADVISOR
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Advisor AI Dashboard */}
+            <div className="bg-gradient-to-br from-indigo-900/20 to-zinc-900 border border-indigo-500/30 rounded-3xl p-5 relative overflow-hidden">
+              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/20 blur-3xl rounded-full" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <BrainCircuit className="w-5 h-5 text-indigo-400" />
+                    <h2 className="text-lg font-bold text-white">IA Advisor (Ação Autônoma)</h2>
+                  </div>
+                  <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-bold border border-indigo-500/30">ANALISANDO</span>
+                </div>
+                
+                <p className="text-xs text-zinc-300 mb-4">
+                  Analisa dados operacionais, de negócio e relatórios da IA Guardian para sugerir estratégias e resolver falhas de sistema automaticamente.
+                </p>
+                
+                <div className="space-y-3">
+
+                  {/* Auto-Fix Section */}
+                  <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3">
+                     <div className="flex items-center justify-between mb-2">
+                       <span className="text-indigo-400 font-bold text-xs flex items-center gap-1">
+                         <Cpu className="w-3.5 h-3.5" /> Correção Automática de Bugs
+                       </span>
+                       <span className="text-[9px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-mono">LOG DE AÇÕES</span>
+                     </div>
+                     <p className="text-[11px] text-zinc-300 leading-relaxed mb-2">
+                       Recebi o alerta da IA Guardian sobre falhas na fila do PIX. Analisei os logs do servidor e notei travamento em processos zumbis na fila temporária.
+                     </p>
+                     <div className="bg-black/40 border border-white/5 p-2 rounded-lg space-y-1">
+                        <div className="flex items-center gap-1.5 text-[10px] text-green-400">
+                          <CheckCircle2 className="w-3 h-3" /> Reiniciei serviço de pagamentos (Gateway)
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] text-green-400">
+                          <CheckCircle2 className="w-3 h-3" /> Limpei fila temporária presa
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] text-green-400">
+                          <CheckCircle2 className="w-3 h-3" /> Reenviei os 15 eventos de falha (Sucesso: 100%)
+                        </div>
+                     </div>
+                     <p className="text-[10px] text-zinc-500 mt-2 font-mono">Resolvido sem intervenção humana às 19:42.</p>
+                  </div>
+
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-3">
+                    <p className="text-[11px] text-zinc-300 leading-relaxed">
+                      <span className="text-indigo-400 font-bold block mb-1">Estratégia de Crescimento (Negócios)</span>
+                      Analisando o fluxo de pedidos, a região do <strong>Coxipó / Tijucal</strong> tem um ticket médio 25% maior às sextas, mas baixa adesão de restaurantes no almoço.
+                      <br/><br/>
+                      💡 <strong className="text-white">Recomendação:</strong> Enviar notificação push recrutando parceiros nessa região com taxa reduzida (12%) nos primeiros 30 dias.
+                    </p>
+                    {adminRole === 'adm' && (
+                      <Button size="sm" className="w-full mt-3 h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px]">
+                        Aprovar Campanha
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-3">
+                    <p className="text-[11px] text-zinc-300 leading-relaxed">
+                      <span className="text-indigo-400 font-bold block mb-1">Prevenção de Crise (Operacional)</span>
+                      Com o bloqueio do motorista "Marcos T." feito pelo Guardian, a zona Cristo Rei pode sofrer com fila de espera e falta de cobertura às 20h.
+                      <br/><br/>
+                      💡 <strong className="text-white">Ação Automática:</strong> Ativei o Bônus Progressivo (+R$ 3,00) no Cristo Rei para atrair entregadores de áreas vizinhas e escalei +1 entregador da fila de espera. Realocação concluída.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        )}
+
+        {activeTab === 'marketing' && adminRole === 'adm' && (
           <div className="animate-in fade-in duration-300">
             <div className="bg-gradient-to-br from-purple-900/20 to-zinc-900 border border-purple-500/30 rounded-3xl p-6 relative overflow-hidden mb-6">
               <div className="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 blur-3xl rounded-full" />
@@ -162,33 +331,23 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
-        ) : (
+        )}
+
+        {activeTab === 'capacity' && (
           <div className="animate-in fade-in duration-300">
             
-            <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 border border-primary/20 rounded-2xl p-4 mb-6 flex gap-3 items-start">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-primary mb-1">Alerta IA de Demanda</h4>
-                <p className="text-xs text-zinc-300 leading-relaxed">
-                  A região <strong>Coxipó / Tijucal</strong> está com fila de espera (8 entregadores), mas a demanda de restaurantes lá cresceu 40%. O sistema automaticamente chamou +2 entregadores aprovados da lista para a escala de hoje.
-                </p>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" className="h-8 bg-primary hover:bg-primary/90 text-black font-bold flex-1">Ver Escala</Button>
-                  <Button size="sm" variant="outline" className="h-8 border-white/10 text-white flex-1">Ver Lista</Button>
-                </div>
-              </div>
-            </div>
-
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-3 mb-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
                   <ShieldAlert className="w-4 h-4 text-blue-500" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Privilégio Admin Ativo</h4>
-                  <p className="text-[10px] text-zinc-400">Você pode aceitar entregas em qualquer zona sem restrição de vagas.</p>
+                  <h4 className="text-xs font-bold text-white">Modo: {adminRole === 'adm' ? 'Administrador' : 'Gerência'}</h4>
+                  <p className="text-[10px] text-zinc-400">
+                    {adminRole === 'adm' 
+                      ? 'Você pode alterar limites de vagas e aprovar motoristas.' 
+                      : 'Você pode visualizar vagas e gerenciar filas, mas não alterar limites globais.'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -236,9 +395,11 @@ export default function AdminDashboard() {
                           <AlertCircle className="w-3.5 h-3.5" />
                           <span><strong>{zone.waitlist}</strong> na lista de espera</span>
                         </div>
-                        <button className="text-[10px] text-zinc-400 hover:text-white flex items-center gap-1 transition-colors">
-                          <PlusCircle className="w-3 h-3" /> Aumentar teto
-                        </button>
+                        {adminRole === 'adm' && (
+                          <button className="text-[10px] text-zinc-400 hover:text-white flex items-center gap-1 transition-colors">
+                            <PlusCircle className="w-3 h-3" /> Aumentar teto
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -252,22 +413,4 @@ export default function AdminDashboard() {
   );
 }
 
-// Inline checkcircle and shieldalert components
-function CheckCircle2({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round" className={className}>
-      <circle cx="12" cy="12" r="10"/>
-      <path d="m9 12 2 2 4-4"/>
-    </svg>
-  );
-}
-
-function ShieldAlert({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinelinejoin="round" className={className}>
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
-      <path d="M12 8v4"/>
-      <path d="M12 16h.01"/>
-    </svg>
-  );
-}
+// Removed inline CheckCircle2 because it is now imported from lucide-react
