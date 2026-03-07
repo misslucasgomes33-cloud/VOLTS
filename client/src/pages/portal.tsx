@@ -1,70 +1,77 @@
 import { Link } from "wouter";
-import { Smartphone, Store, Bike, ShieldCheck, Zap } from "lucide-react";
+import { Zap, ShieldCheck, Bike, Utensils, LayoutDashboard } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Portal() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      <div className="absolute top-[-20%] left-[-10%] w-[140%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
-      
-      <div className="flex flex-col items-center mb-12 relative z-10">
-        <div className="w-16 h-16 bg-black border border-primary/30 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(255,204,0,0.3)] mb-4">
-          <Zap className="w-8 h-8 text-primary" fill="currentColor" />
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[40%] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[120%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-md flex flex-col items-center">
+        {/* Logo */}
+        <div className="w-24 h-24 bg-primary rounded-3xl flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(255,204,0,0.4)] rotate-3">
+          <Zap className="w-12 h-12 text-black" fill="currentColor" />
         </div>
-        <h1 className="text-3xl font-display font-black text-white tracking-tight text-center">
+        
+        <h1 className="text-4xl font-display font-black text-white tracking-tight mb-2 text-center">
           Ecossistema VOLTS
         </h1>
-        <p className="text-zinc-400 text-sm mt-2 text-center max-w-xs">
-          Selecione qual aplicativo deseja simular neste protótipo
+        <p className="text-zinc-400 text-center mb-12">
+          Selecione o aplicativo que deseja acessar
         </p>
-      </div>
 
-      <div className="w-full max-w-sm space-y-4 relative z-10">
-        {/* App Cliente */}
-        <Link href="/login">
-          <div className="bg-zinc-900 border border-white/10 hover:border-primary/50 p-5 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group hover:scale-[1.02]">
-            <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center shrink-0">
-              <Smartphone className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-white font-bold">VOLTS Cliente</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">App para pedir comida (Usuário final)</p>
-            </div>
-          </div>
-        </Link>
-
-        {/* App Operacional */}
-        <Link href="/operacional">
-          <div className="bg-zinc-900 border border-white/10 hover:border-blue-500/50 p-5 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group hover:scale-[1.02]">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center shrink-0">
-              <div className="flex items-center gap-1">
-                <Store className="w-4 h-4 text-blue-500" />
-                <Bike className="w-4 h-4 text-blue-500" />
+        {/* App Links */}
+        <div className="w-full space-y-4">
+          
+          {/* Cliente App */}
+          <Link href="/login">
+            <div className="w-full bg-zinc-900 border border-primary/30 hover:border-primary/80 p-5 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group hover:scale-[1.02] shadow-lg">
+              <div className="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-primary/30 transition-colors">
+                <Utensils className="w-7 h-7 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-white font-bold text-lg group-hover:text-primary transition-colors">VOLTS Cliente</h2>
+                <p className="text-xs text-zinc-400 mt-1">App para clientes fazerem pedidos</p>
               </div>
             </div>
-            <div>
-              <h2 className="text-white font-bold">VOLTS Operacional</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">App para Restaurantes e Motoristas</p>
-            </div>
-          </div>
-        </Link>
+          </Link>
 
-        {/* App Admin */}
-        <Link href="/admin">
-          <div className="bg-zinc-900 border border-white/10 hover:border-purple-500/50 p-5 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group hover:scale-[1.02]">
-            <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-6 h-6 text-purple-500" />
+          {/* Operacional App */}
+          <Link href="/operacional">
+            <div className="w-full bg-zinc-900 border border-blue-500/30 hover:border-blue-500/80 p-5 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group hover:scale-[1.02] shadow-lg">
+              <div className="w-14 h-14 bg-blue-500/20 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/30 transition-colors">
+                <Bike className="w-7 h-7 text-blue-500" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-white font-bold text-lg group-hover:text-blue-400 transition-colors">VOLTS Operacional</h2>
+                <p className="text-xs text-zinc-400 mt-1">App para entregadores e parceiros</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-white font-bold">VOLTS Admin</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">App de Gestão Global e Vagas</p>
+          </Link>
+
+          {/* Admin App */}
+          <Link href="/admin">
+            <div className="w-full bg-zinc-900 border border-purple-500/30 hover:border-purple-500/80 p-5 rounded-2xl flex items-center gap-4 cursor-pointer transition-all group hover:scale-[1.02] shadow-lg">
+              <div className="w-14 h-14 bg-purple-500/20 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-purple-500/30 transition-colors">
+                <ShieldCheck className="w-7 h-7 text-purple-500" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-white font-bold text-lg group-hover:text-purple-400 transition-colors">VOLTS Gestão</h2>
+                <p className="text-xs text-zinc-400 mt-1">Painel ADM central e Gerência local</p>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+
+        </div>
+        
+        <div className="mt-12 text-center">
+          <p className="text-[10px] text-zinc-600 font-mono uppercase tracking-widest">
+            Mockup Mode • v1.0.0
+          </p>
+        </div>
       </div>
-      
-      <p className="absolute bottom-8 text-[10px] text-zinc-600 font-medium tracking-widest uppercase">
-        DEV PROTOTYPE LAUNCHER
-      </p>
     </div>
   );
 }

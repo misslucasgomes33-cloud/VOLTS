@@ -27,6 +27,15 @@ export default function AdminDashboard() {
   const [videoReady, setVideoReady] = useState(false);
   const [template, setTemplate] = useState("launch");
 
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    // Simulate generation time
+    setTimeout(() => {
+      setIsGenerating(false);
+      setVideoReady(true);
+    }, 2500);
+  };
+
   // AI Chat State
   const [isListening, setIsListening] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
