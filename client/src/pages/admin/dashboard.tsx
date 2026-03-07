@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send, Map as MapIcon, Navigation, FileText, DollarSign, ListOrdered, Shield, QrCode, Trash2 } from "lucide-react";
+import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send, Map as MapIcon, Navigation, FileText, DollarSign, ListOrdered, Shield, QrCode, Trash2, TrendingUp, Filter, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
 import MapComponent from "@/components/MapComponent";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
 // Import the generated video
 import promoVideo from '@/assets/videos/promo-volts.mp4';
@@ -16,6 +17,26 @@ const zoneCapacity = [
   { id: 3, name: "Jd Glória / Mapim / Nova Esperança / Cohab Michel / Jacarandá", type: "driver", max: 15, current: 15, city: "Várzea Grande", waitlist: 5 },
   { id: 4, name: "Centro / CPA / Santa Rosa", type: "driver", max: 15, current: 15, city: "Cuiabá", waitlist: 0 },
   { id: 5, name: "Coxipó / Tijucal", type: "driver", max: 10, current: 10, city: "Cuiabá", waitlist: 8 },
+];
+
+const financialData = [
+  { name: 'Seg', bruto: 4000, repasseParceiro: 2500, repasseMotoboy: 800, lucro: 700 },
+  { name: 'Ter', bruto: 3000, repasseParceiro: 1800, repasseMotoboy: 700, lucro: 500 },
+  { name: 'Qua', bruto: 5000, repasseParceiro: 3200, repasseMotoboy: 900, lucro: 900 },
+  { name: 'Qui', bruto: 4500, repasseParceiro: 2800, repasseMotoboy: 850, lucro: 850 },
+  { name: 'Sex', bruto: 8000, repasseParceiro: 5200, repasseMotoboy: 1500, lucro: 1300 },
+  { name: 'Sáb', bruto: 11000, repasseParceiro: 7500, repasseMotoboy: 1900, lucro: 1600 },
+  { name: 'Dom', bruto: 9500, repasseParceiro: 6200, repasseMotoboy: 1700, lucro: 1600 },
+];
+
+const avulsoData = [
+  { time: '08:00', valor: 50 },
+  { time: '10:00', valor: 120 },
+  { time: '12:00', valor: 250 },
+  { time: '14:00', valor: 180 },
+  { time: '16:00', valor: 220 },
+  { time: '18:00', valor: 400 },
+  { time: '20:00', valor: 650 },
 ];
 
 export default function AdminDashboard() {
@@ -121,30 +142,37 @@ export default function AdminDashboard() {
     setChatHistory(newHistory);
     setChatMessage("");
     
-    // Mock AI response
+    // Mock AI response with advanced logic based on user prompt
     setTimeout(() => {
-      let responseText = "Entendido, chefe. Estou monitorando isso de perto.";
+      let responseText = "Compreendido. Registrei a informação e estou monitorando a operação no painel.";
+      const msgLower = chatMessage.toLowerCase();
       
-      if (chatMessage.toLowerCase().includes("piada")) {
+      if (msgLower.includes("piada")) {
         responseText = "Por que o banco de dados foi ao psiquiatra? Porque ele tinha muitos relacionamentos rompidos! 🥁 Ba-dum-tss. Brincadeiras à parte, a latência está em 42 milissegundos hoje.";
-      } else if (chatMessage.toLowerCase().includes("problema") || chatMessage.toLowerCase().includes("bug") || chatMessage.toLowerCase().includes("b.o") || chatMessage.toLowerCase().includes("erro") || chatMessage.toLowerCase().includes("resolver")) {
+      } else if (msgLower.includes("problema") || msgLower.includes("bug") || msgLower.includes("erro") || msgLower.includes("resolver")) {
         responseText = "Pode deixar comigo. Já zerei a fila fantasma do PIX, reiniciei o gateway de pagamentos e bloqueei 3 IPs suspeitos de fraude na última hora. O sistema está blindado e voando baixo.";
-      } else if (chatMessage.toLowerCase().includes("relatório") || chatMessage.toLowerCase().includes("status") || chatMessage.toLowerCase().includes("vendas")) {
-        responseText = "Tivemos 1.240 pedidos hoje, com ticket médio de R$ 42. A região do Coxipó está com alta demanda mas poucos entregadores. Sugiro darmos um bônus dinâmico na região Centro agora no jantar. Devo ativar a campanha?";
+      } else if (msgLower.includes("relatório") || msgLower.includes("status") || msgLower.includes("vendas") || msgLower.includes("como está a operação")) {
+        responseText = "Hoje temos 1.240 pedidos em andamento, 125 motoboys online e 45 restaurantes ativos. A região do Coxipó está com alta demanda mas poucos entregadores. Sugiro darmos um bônus dinâmico na região Centro agora no jantar. Devo ativar a campanha?";
+      } else if (msgLower.includes("motoboy") && msgLower.includes("falta")) {
+        responseText = "Atualmente estamos com uma defasagem de 12% na frota do Centro de Cuiabá. Recomendo ativar a campanha automática de recrutamento no painel de Criativos IA e oferecer taxa zero no primeiro repasse. Quer que eu prepare o criativo?";
+      } else if (msgLower.includes("bairro") || msgLower.includes("região")) {
+        responseText = "Os bairros com maior volume de pedidos hoje são: Cristo Rei (Várzea Grande) e CPA (Cuiabá). Porém, o ticket médio mais alto está na região do Santa Rosa.";
+      } else if (msgLower.includes("gerência") || msgLower.includes("equipe")) {
+        responseText = "A equipe de Várzea Grande resolveu 14 chamados de suporte hoje. O tempo médio de resposta está em 2 minutos. Excelente desempenho!";
       }
 
       setChatHistory([...newHistory, { role: 'ai', text: responseText }]);
       speakText(responseText);
-    }, 1000);
+    }, 1200);
   };
 
   const toggleVoice = () => {
     setIsListening(!isListening);
     if (!isListening) {
       setTimeout(() => {
-        setChatMessage("Como estão as vendas hoje?");
+        setChatMessage("Como está a operação hoje?");
         setIsListening(false);
-      }, 2000);
+      }, 2500);
     }
   };
 
@@ -175,6 +203,23 @@ export default function AdminDashboard() {
           >
             <BrainCircuit className="w-3.5 h-3.5" /> Monitor IA
           </button>
+          
+          <button 
+            onClick={() => setActiveTab('orders')}
+            className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'orders' ? 'bg-blue-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          >
+            <ListOrdered className="w-3.5 h-3.5" /> Pedidos
+          </button>
+          
+          {adminRole === 'adm' && (
+            <button 
+              onClick={() => setActiveTab('financial')}
+              className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'financial' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              <DollarSign className="w-3.5 h-3.5" /> Financeiro
+            </button>
+          )}
+
           {adminRole === 'adm' && (
             <button 
               onClick={() => setActiveTab('marketing')}
@@ -197,6 +242,20 @@ export default function AdminDashboard() {
           >
             <Users className="w-3.5 h-3.5" /> Vagas / Zonas
           </button>
+          <button 
+            onClick={() => setActiveTab('support')}
+            className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'support' ? 'bg-orange-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" /> Suporte
+          </button>
+          {adminRole === 'adm' && (
+            <button 
+              onClick={() => setActiveTab('logs')}
+              className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'logs' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              <Shield className="w-3.5 h-3.5" /> Sec & Logs
+            </button>
+          )}
           <button 
             onClick={() => setActiveTab('map')}
             className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'map' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
@@ -650,6 +709,273 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {activeTab === 'orders' && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <div className="bg-gradient-to-br from-blue-900/20 to-zinc-900 border border-blue-500/30 rounded-3xl p-5 relative overflow-hidden mb-6">
+              <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 blur-3xl rounded-full" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <ListOrdered className="w-5 h-5 text-blue-400" />
+                  <h2 className="text-lg font-bold text-white">Gestão de Pedidos ({adminCity})</h2>
+                </div>
+                <p className="text-sm text-zinc-300 mb-6">Acompanhamento em tempo real dos pedidos na cidade.</p>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-4">
+                    <p className="text-xs text-zinc-500 mb-1">Total Hoje</p>
+                    <p className="text-2xl font-black text-white">1.240</p>
+                  </div>
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-4">
+                    <p className="text-xs text-zinc-500 mb-1">Em Andamento</p>
+                    <p className="text-2xl font-black text-blue-400">84</p>
+                  </div>
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-4">
+                    <p className="text-xs text-zinc-500 mb-1">Cancelados</p>
+                    <p className="text-2xl font-black text-red-400">12</p>
+                  </div>
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-4">
+                    <p className="text-xs text-zinc-500 mb-1">Tempo Médio</p>
+                    <p className="text-2xl font-black text-emerald-400">28m</p>
+                  </div>
+                </div>
+
+                <div className="bg-black/40 border border-white/5 rounded-xl p-4">
+                  <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">Pedidos Recentes</h3>
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-zinc-900 border border-white/5 rounded-lg">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-bold text-white">#VOLTS-{1000 + i}</span>
+                            <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">Em Andamento</span>
+                          </div>
+                          <p className="text-[11px] text-zinc-400">Pizza Hut • Cliente: João S. • R$ 84,50</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline" className="h-7 text-[10px] border-white/10">Ver Detalhes</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'financial' && adminRole === 'adm' && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <div className="bg-gradient-to-br from-emerald-900/20 to-zinc-900 border border-emerald-500/30 rounded-3xl p-5 relative overflow-hidden mb-6">
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-emerald-500/20 blur-3xl rounded-full" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <DollarSign className="w-5 h-5 text-emerald-400" />
+                  <h2 className="text-lg font-bold text-white">Sistema Financeiro Global</h2>
+                </div>
+                <p className="text-sm text-zinc-300 mb-6">Visão completa de faturamento, repasses e lucro da plataforma.</p>
+
+                {/* Filtros Financeiros */}
+                <div className="flex gap-2 mb-6 overflow-x-auto hide-scrollbar pb-2">
+                  <Button size="sm" variant="outline" className="border-emerald-500/50 bg-emerald-500/10 text-emerald-400 h-8 text-xs shrink-0">Hoje</Button>
+                  <Button size="sm" variant="outline" className="border-white/10 bg-zinc-900/50 text-zinc-300 hover:text-white h-8 text-xs shrink-0">Últimos 7 dias</Button>
+                  <Button size="sm" variant="outline" className="border-white/10 bg-zinc-900/50 text-zinc-300 hover:text-white h-8 text-xs shrink-0">Este Mês</Button>
+                  <Button size="sm" variant="outline" className="border-white/10 bg-zinc-900/50 text-zinc-300 hover:text-white h-8 text-xs shrink-0">Filtrar por Cidade</Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5">
+                    <p className="text-xs text-emerald-400 font-bold uppercase tracking-wider mb-1">Lucro VOLTS (Liquído)</p>
+                    <p className="text-3xl font-black text-white">R$ 4.250,00</p>
+                    <p className="text-[10px] text-zinc-400 mt-2">+12% vs. ontem</p>
+                  </div>
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-5">
+                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Total Faturado (Bruto)</p>
+                    <p className="text-3xl font-black text-zinc-300">R$ 52.480,00</p>
+                  </div>
+                  <div className="bg-zinc-950/50 border border-white/5 rounded-xl p-5">
+                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Avulsos (Motoboy)</p>
+                    <p className="text-3xl font-black text-zinc-300">R$ 850,00</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-black/40 border border-white/5 rounded-xl p-5">
+                    <h3 className="text-sm font-bold text-white mb-4">Repasses Agendados</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-zinc-400">Restaurantes Parceiros</span>
+                          <span className="text-white font-bold">R$ 38.500,00</span>
+                        </div>
+                        <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+                          <div className="bg-blue-500 h-full w-[75%]"></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-zinc-400">Motoboys</span>
+                          <span className="text-white font-bold">R$ 8.880,00</span>
+                        </div>
+                        <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+                          <div className="bg-yellow-500 h-full w-[18%]"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/40 border border-white/5 rounded-xl p-5 md:col-span-2">
+                    <h3 className="text-sm font-bold text-white mb-4 flex justify-between items-center">
+                      Desempenho Financeiro
+                      <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded cursor-pointer">Ver Detalhes</span>
+                    </h3>
+                    <div className="h-[200px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={financialData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="colorBruto" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                          <XAxis dataKey="name" stroke="#ffffff50" fontSize={10} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#ffffff50" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value/1000}k`} />
+                          <RechartsTooltip 
+                            contentStyle={{ backgroundColor: '#18181b', borderColor: '#ffffff10', borderRadius: '8px', fontSize: '12px' }}
+                            itemStyle={{ color: '#fff' }}
+                            formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, '']}
+                          />
+                          <Area type="monotone" dataKey="bruto" name="Faturamento Bruto" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorBruto)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/40 border border-white/5 rounded-xl p-5 md:col-span-2">
+                    <h3 className="text-sm font-bold text-white mb-4 flex justify-between items-center">
+                      Acompanhamento de Valores Avulsos
+                      <span className="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded cursor-pointer">Exportar XLS</span>
+                    </h3>
+                    <div className="h-[200px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={avulsoData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                          <XAxis dataKey="time" stroke="#ffffff50" fontSize={10} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#ffffff50" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value}`} />
+                          <RechartsTooltip 
+                            contentStyle={{ backgroundColor: '#18181b', borderColor: '#ffffff10', borderRadius: '8px', fontSize: '12px' }}
+                            itemStyle={{ color: '#fff' }}
+                            cursor={{ fill: '#ffffff05' }}
+                            formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, 'Avulso']}
+                          />
+                          <Bar dataKey="valor" name="Avulsos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'support' && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <div className="bg-gradient-to-br from-orange-900/20 to-zinc-900 border border-orange-500/30 rounded-3xl p-5 relative overflow-hidden mb-6">
+              <div className="absolute -left-10 -top-10 w-40 h-40 bg-orange-500/20 blur-3xl rounded-full" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-orange-400" />
+                    <h2 className="text-lg font-bold text-white">Central de Suporte</h2>
+                  </div>
+                  <div className="flex gap-2">
+                     <span className="px-2 py-1 bg-red-500/20 text-red-400 text-[10px] font-bold rounded">3 Pendentes</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-black/60 border border-orange-500/30 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                        <span className="text-xs font-bold text-white">Carlos M. (Motoboy)</span>
+                        <span className="text-[9px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">Há 5 min</span>
+                      </div>
+                      <span className="text-[9px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded font-bold uppercase">Repasse</span>
+                    </div>
+                    <p className="text-sm text-zinc-300 mb-3">
+                      "Minha taxa da corrida do Burger King de 12:30 não caiu na carteira. O app travou na hora."
+                    </p>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="h-8 bg-orange-600 hover:bg-orange-700 text-white text-[10px]">Responder</Button>
+                      <Button size="sm" variant="outline" className="h-8 border-white/10 text-[10px]">Resolver Automático (IA)</Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/40 border border-white/5 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white">Restaurante Sabor de Casa</span>
+                        <span className="text-[9px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">Há 15 min</span>
+                      </div>
+                      <span className="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold uppercase">Pedido Atrasado</span>
+                    </div>
+                    <p className="text-sm text-zinc-300 mb-3">
+                      "O motoboy aceitou o pedido #1045 há 20 minutos e ainda não chegou para coletar."
+                    </p>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="h-8 bg-zinc-800 hover:bg-zinc-700 text-white text-[10px]">Responder</Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'logs' && adminRole === 'adm' && (
+          <div className="animate-in fade-in duration-300 space-y-6">
+            <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 mb-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Shield className="w-5 h-5 text-zinc-400" />
+                <h2 className="text-lg font-bold text-white">Logs de Segurança (Audit)</h2>
+              </div>
+              <p className="text-sm text-zinc-400 mb-6">Registro imutável de ações sensíveis no painel administrativo.</p>
+
+              <div className="space-y-1">
+                <div className="grid grid-cols-4 gap-4 p-2 border-b border-white/5 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                  <div>Data / Hora</div>
+                  <div>Usuário</div>
+                  <div>Ação</div>
+                  <div>Detalhes</div>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-4 p-3 border-b border-white/5 text-xs bg-black/20 hover:bg-black/40 transition-colors rounded">
+                  <div className="text-zinc-400 font-mono">Hoje, 14:32</div>
+                  <div className="text-white">Lucas (ADM)</div>
+                  <div className="text-emerald-400">Aprovação Entregador</div>
+                  <div className="text-zinc-500">Aprovou cadastro ID 8492</div>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-4 p-3 border-b border-white/5 text-xs bg-black/20 hover:bg-black/40 transition-colors rounded">
+                  <div className="text-zinc-400 font-mono">Hoje, 11:15</div>
+                  <div className="text-white">Carlos (Gerência VG)</div>
+                  <div className="text-blue-400">Alteração Status</div>
+                  <div className="text-zinc-500">Pausou restaurante 'Sushizen'</div>
+                </div>
+
+                <div className="grid grid-cols-4 gap-4 p-3 border-b border-white/5 text-xs bg-red-500/5 hover:bg-red-500/10 transition-colors rounded">
+                  <div className="text-zinc-400 font-mono">Ontem, 22:10</div>
+                  <div className="text-red-400 font-bold">Sistema (IA)</div>
+                  <div className="text-red-400">Bloqueio Automático</div>
+                  <div className="text-zinc-500">Bloqueou IP 192.168.1.5 (Fraude)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'capacity' && (
           <div className="animate-in fade-in duration-300">
             
@@ -743,7 +1069,7 @@ export default function AdminDashboard() {
               </div>
               
               <div className="flex-1 bg-black rounded-2xl overflow-hidden border border-white/5 relative">
-                <MapComponent />
+                <MapComponent mode="admin" city={adminCity} />
                 
                 {/* Overlay Panel */}
                 <div className="absolute top-4 left-4 right-4 bg-zinc-950/80 backdrop-blur-md border border-white/10 rounded-2xl p-3 z-10 flex gap-4 overflow-x-auto hide-scrollbar">

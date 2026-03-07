@@ -1,0 +1,216 @@
+Precisamos melhorar bastante o painel ADM, IA e sistema de mapas do VOLTS.
+
+PRIMEIRO – garantir que todos os módulos funcionem corretamente e corrigir possíveis bugs.
+
+---
+
+1️⃣ MELHORAR A IA DO PAINEL
+
+A IA precisa ser mais inteligente, criativa e interativa.
+
+Ela deve:
+
+• entender melhor perguntas
+• responder com mais inteligência
+• sugerir melhorias para o sistema
+• ajudar a resolver problemas da operação
+• ajudar com estratégia do aplicativo
+
+Adicionar modo conversa.
+
+Eu devo poder perguntar coisas como:
+
+"Como está a operação hoje?"
+
+"Tem algum problema com motoboys?"
+
+"Quais bairros estão com mais pedidos?"
+
+---
+
+2️⃣ IA COM VOZ
+
+Adicionar opção de voz.
+
+A IA deve:
+
+• falar comigo com voz
+• eu poder ouvir as respostas
+• ela poder ouvir minha pergunta por voz
+• responder com inteligência
+
+Adicionar botão:
+
+"Ativar voz da IA"
+
+Ela pode falar por exemplo:
+
+"Bom dia equipe. Hoje temos X pedidos, X motoboys online e X parceiros ativos."
+
+---
+
+3️⃣ SISTEMA FINANCEIRO COMPLETO (ADM)
+
+O painel do ADM precisa ter sistema financeiro completo.
+
+Mostrar gráficos de:
+
+• ganhos do dia
+• ganhos da semana
+• ganhos do mês
+• ganhos do ano
+• total faturado da plataforma
+
+Mostrar também separado:
+
+• total repassado para parceiros
+• total repassado para motoboys
+• lucro da plataforma VOLTS
+
+---
+
+4️⃣ HISTÓRICO FINANCEIRO
+
+Adicionar histórico completo:
+
+• histórico diário
+• histórico semanal
+• histórico mensal
+• histórico anual
+
+Permitir filtros por:
+
+• cidade
+• parceiro
+• período
+
+---
+
+5️⃣ SISTEMA DE AVULSOS
+
+Criar painel específico para acompanhar valores avulsos.
+
+Mostrar:
+
+• total de avulso recebido
+• histórico de avulso
+• data e hora
+• origem do valor
+
+Criar gráfico de acompanhamento de avulsos.
+
+---
+
+6️⃣ CENTRAL DE SUPORTE
+
+Criar sistema de mensagens.
+
+Quando a IA não conseguir resolver um problema de:
+
+• cliente
+• motoboy
+• parceiro
+
+A conversa deve ser enviada automaticamente para o painel ADM.
+
+Mostrar:
+
+• nome do usuário
+• tipo (cliente / motoboy / parceiro)
+• mensagem
+• data e hora
+
+Permitir responder diretamente.
+
+Status:
+
+• pendente
+• respondido
+• resolvido
+
+---
+
+7️⃣ RELATÓRIOS PARA GERÊNCIA (LIMITADO)
+
+Gerência pode ver relatórios da cidade dela.
+
+Gerência vê:
+
+• pedidos da cidade
+• faturamento da cidade
+• motoboys ativos
+• parceiros ativos
+• desempenho da operação
+
+Gerência NÃO pode ver:
+
+• lucro total da empresa
+• faturamento de outras cidades
+• sistema financeiro completo
+
+Essas informações são exclusivas do ADM.
+
+---
+
+8️⃣ REGISTRO DE AÇÕES
+
+Criar sistema de logs de segurança.
+
+Registrar:
+
+• quem fez a ação
+• qual ação foi feita
+• data e hora
+
+Isso evita fraude interna.
+
+---
+
+9️⃣ MELHORAR O SISTEMA DE MAPA
+
+Melhorar bastante o mapa da plataforma.
+
+Adicionar:
+
+• mapa em tempo real dos pedidos
+• mapa mostrando motoboys online
+• mapa mostrando restaurantes parceiros
+• mapa mostrando entregas acontecendo
+
+No painel ADM deve mostrar:
+
+• motoboys ativos no mapa
+• pedidos em andamento
+• regiões com mais pedidos
+
+Adicionar também:
+
+• destaque de bairros com maior demanda
+• alerta quando faltar motoboy em uma região
+
+---
+
+🔟 MAPA PARA GERÊNCIA
+
+Gerência também pode ver mapa, mas somente da cidade dela.
+
+Mostrar:
+
+• motoboys da cidade
+• pedidos da cidade
+• parceiros da cidade
+
+Sem acesso a outras cidades.
+
+---
+
+OBJETIVO:
+
+Transformar o painel ADM do VOLTS em um sistema completo com:
+
+• IA inteligente
+• comandos por voz
+• relatórios financeiros completos
+• gráficos de operação
+• controle de suporte
+• mapas em tempo real da operação
