@@ -244,14 +244,14 @@ export default function PartnerDashboard() {
                 <h4 className="text-xl font-black text-white">PREMIUM</h4>
               </div>
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-2xl font-bold text-primary">12%</span>
+                <span className="text-2xl font-bold text-primary">13%</span>
                 <span className="text-zinc-400 text-sm">de taxa</span>
               </div>
               <p className="text-xs text-zinc-400 mb-6">Ideal para quem quer crescer e aparecer mais para os clientes.</p>
               
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2 text-sm text-zinc-300">
-                  <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" /> <span>Taxa reduzida (12%)</span>
+                  <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" /> <span>Taxa reduzida (13%)</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-zinc-300">
                   <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" /> <span>Posicionamento especial nas buscas</span>
