@@ -2,12 +2,14 @@ import { Power, MapPin, Navigation, Wallet, ShieldAlert, Zap, Banknote, ListOrde
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import MapComponent from "@/components/MapComponent";
+import { useAuth } from "@/lib/auth";
 
 export default function DriverDashboard() {
+  const { user } = useAuth();
   const [isOnline, setIsOnline] = useState(false);
   const [showSOS, setShowSOS] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
-  const [isAdminDriver, setIsAdminDriver] = useState(true);
+  const [isAdminDriver, setIsAdminDriver] = useState(false);
   
   // Delivery states
   const [hasNewOrder, setHasNewOrder] = useState(false);
@@ -89,7 +91,7 @@ export default function DriverDashboard() {
           </div>
           <div onClick={toggleAdmin} className="cursor-pointer">
             <h2 className="text-white font-bold text-sm flex items-center gap-1">
-              Carlos M. {isAdminDriver && <span className="text-xs text-purple-400 font-normal">(Admin)</span>}
+              {user?.name || "Motorista"} {isAdminDriver && <span className="text-xs text-purple-400 font-normal">(Admin)</span>}
             </h2>
             <div className="flex items-center gap-1">
               <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">Nível Ouro</span>

@@ -1,8 +1,10 @@
 import { User, Settings, MapPin, CreditCard, Bell, HelpCircle, LogOut, ChevronRight, Zap } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/lib/auth";
 
 export default function Profile() {
   const [, setLocation] = useLocation();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     { icon: MapPin, label: "Endereços", desc: "Meus endereços de entrega" },
@@ -12,6 +14,11 @@ export default function Profile() {
     { icon: Settings, label: "Configurações", desc: "Dados da conta" },
     { icon: HelpCircle, label: "Ajuda", desc: "Suporte e Dúvidas" },
   ];
+
+  const handleLogout = () => {
+    logout();
+    setLocation("/login");
+  };
 
   return (
     <div className="flex flex-col min-h-full pb-24 bg-zinc-950">
@@ -25,8 +32,8 @@ export default function Profile() {
             </div>
           </div>
           <div>
-            <h1 className="text-2xl font-display font-bold text-white">João Silva</h1>
-            <p className="text-zinc-400 text-sm">joao@example.com</p>
+            <h1 data-testid="text-username" className="text-2xl font-display font-bold text-white">{user?.name || "Visitante"}</h1>
+            <p className="text-zinc-400 text-sm">{user?.email || ""}</p>
             <div className="mt-2 inline-flex items-center gap-1 bg-primary/20 border border-primary/30 px-2 py-0.5 rounded text-xs font-bold text-primary">
               <Zap className="w-3 h-3" fill="currentColor" /> Cliente VIP
             </div>
@@ -58,7 +65,8 @@ export default function Profile() {
         </div>
 
         <button 
-          onClick={() => setLocation("/login")}
+          data-testid="button-logout"
+          onClick={handleLogout}
           className="w-full mt-6 bg-transparent border border-red-500/30 text-red-500 font-medium h-14 rounded-xl flex items-center justify-center gap-2 hover:bg-red-500/10 transition-colors"
         >
           <LogOut className="w-5 h-5" />

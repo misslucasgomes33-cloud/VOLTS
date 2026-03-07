@@ -1,7 +1,9 @@
-import { Search, MapPin, Zap, Star, ChevronRight, Bot, TrendingDown, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, MapPin, Zap, Star, ChevronRight, Bot, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/lib/auth";
 
 import burgerImg from '@/assets/burger.png';
 import pizzaImg from '@/assets/pizza.png';
@@ -20,22 +22,55 @@ const categories = [
   { id: 6, name: "Farmácia", icon: "💊", image: pharmacyImg },
 ];
 
-const recommended = [
-  { id: 1, name: "Volt Burger", rating: 4.9, time: "15-25 min", fee: "R$ 4,99", image: burgerImg, tags: ["Lanches", "Premium"] },
-  { id: 2, name: "Pizza Express", rating: 4.7, time: "30-40 min", fee: "Grátis", image: pizzaImg, tags: ["Pizza", "Italiana"] },
-  { id: 3, name: "Açaí Energy", rating: 4.8, time: "10-20 min", fee: "R$ 2,99", image: acaiImg, tags: ["Doces", "Açaí"] },
-];
+const categoryImages: Record<string, string> = {
+  "Lanches": burgerImg,
+  "Pizza": pizzaImg,
+  "Açaí": acaiImg,
+  "Restaurante": burgerImg,
+  "Bebidas": drinksImg,
+  "Mercado": meatImg,
+};
 
 const banners = [
   { id: 1, image: bannerImg, title: "Ofertas Relâmpago", subtitle: "Até 50% OFF" }
 ];
 
+interface Restaurant {
+  id: number;
+  name: string;
+  category: string | null;
+  city: string | null;
+  rating: string | null;
+  deliveryTime: string | null;
+  deliveryFee: string | null;
+  isOpen: boolean | null;
+}
+
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    fetch("/api/restaurants")
+      .then(res => res.json())
+      .then(data => setRestaurants(data))
+      .catch(() => {});
+  }, []);
+
+  const filteredRestaurants = restaurants.filter(r =>
+    !searchQuery || r.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (r.category && r.category.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const getRestaurantImage = (r: Restaurant) => {
+    if (r.category && categoryImages[r.category]) return categoryImages[r.category];
+    return burgerImg;
+  };
 
   return (
     <div className="flex flex-col min-h-full pb-24">
-      {/* Header */}
       <div className="bg-zinc-950 px-5 pt-8 pb-4 sticky top-0 z-40 border-b border-white/5">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2 text-white">
@@ -43,7 +78,7 @@ export default function Home() {
             <div className="flex flex-col">
               <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Entregar em</span>
               <div className="flex items-center gap-1 font-medium text-sm">
-                Cuiabá, Centro <ChevronRight className="w-4 h-4" />
+                {user?.city || "Cuiabá"}, Centro <ChevronRight className="w-4 h-4" />
               </div>
             </div>
           </div>
@@ -57,13 +92,15 @@ export default function Home() {
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input 
+            data-testid="input-search"
             placeholder="Comida, mercado, farmácia..." 
             className="pl-12 h-12 bg-zinc-900 border-white/5 rounded-2xl text-white focus-visible:ring-primary/30 shadow-inner text-base"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Dynamic AI Alert */}
       <div className="px-5 mt-4">
         <div onClick={() => setLocation('/chat')} className="cursor-pointer bg-gradient-to-r from-zinc-900 to-zinc-800 border border-primary/20 rounded-2xl p-4 flex gap-4 items-start relative overflow-hidden group hover:border-primary/40 transition-all mb-4">
           <div className="absolute right-0 top-0 w-32 h-32 bg-primary/10 blur-2xl rounded-full" />
@@ -84,7 +121,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Customer Mission */}
         <div className="bg-zinc-900 border border-white/5 rounded-2xl p-4 relative overflow-hidden">
           <div className="flex justify-between items-center mb-3">
             <h4 className="font-bold text-sm text-white flex items-center gap-2">
@@ -107,7 +143,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero Banner */}
       <div className="px-5 mt-6">
         <div className="relative h-36 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
           <img src={bannerImg} alt="Banner" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -117,14 +152,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Categories Grid */}
       <div className="px-5 mt-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-white">Categorias</h2>
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {categories.map((cat) => (
-            <div key={cat.id} className="flex flex-col items-center gap-2 group cursor-pointer">
+            <div key={cat.id} className="flex flex-col items-center gap-2 group cursor-pointer" onClick={() => setSearchQuery(cat.name)}>
               <div className="w-full aspect-square rounded-2xl bg-zinc-900 border border-white/5 overflow-hidden relative shadow-sm group-hover:border-primary/50 transition-colors">
                 <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
                 <div className="absolute inset-0 flex items-center justify-center text-3xl z-10 drop-shadow-md">
@@ -139,7 +173,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Recommended list */}
       <div className="px-5 mt-10 mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -149,44 +182,53 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {recommended.map((item) => (
-            <Card key={item.id} className="bg-zinc-900/50 border-white/5 overflow-hidden group hover:bg-zinc-900 hover:border-primary/30 transition-all cursor-pointer">
+          {filteredRestaurants.length > 0 ? filteredRestaurants.map((item) => (
+            <Card key={item.id} data-testid={`card-restaurant-${item.id}`} className="bg-zinc-900/50 border-white/5 overflow-hidden group hover:bg-zinc-900 hover:border-primary/30 transition-all cursor-pointer">
               <CardContent className="p-0">
                 <div className="w-full h-36 relative overflow-hidden">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={getRestaurantImage(item)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
                   <div className="absolute top-3 right-3 bg-zinc-900/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 border border-white/10">
                     <Clock className="w-3 h-3 text-primary" />
-                    <span className="text-[10px] font-bold text-white">{item.time}</span>
+                    <span className="text-[10px] font-bold text-white">{item.deliveryTime || "20-35 min"}</span>
                   </div>
+                  {!item.isOpen && (
+                    <div className="absolute top-3 left-3 bg-red-500/90 px-2 py-1 rounded-lg">
+                      <span className="text-[10px] font-bold text-white">Fechado</span>
+                    </div>
+                  )}
                 </div>
                 <div className="p-4 -mt-6 relative z-10">
                   <div className="flex justify-between items-end mb-2">
                     <h3 className="font-display font-bold text-white text-lg tracking-tight">{item.name}</h3>
                     <div className="flex items-center gap-1 bg-zinc-900 px-2 py-1 rounded-lg border border-primary/20 shadow-[0_0_10px_rgba(255,204,0,0.1)]">
                       <Star className="w-3.5 h-3.5 text-primary" fill="currentColor" />
-                      <span className="text-xs font-bold text-primary">{item.rating}</span>
+                      <span className="text-xs font-bold text-primary">{item.rating || "4.5"}</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-md">{item.tags[0]}</span>
+                    <span className="text-xs text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-md">{item.category || "Restaurante"}</span>
                     <span className="text-xs text-zinc-500">•</span>
-                    <span className="text-xs text-zinc-400">{item.tags[1]}</span>
+                    <span className="text-xs text-zinc-400">{item.city}</span>
                   </div>
 
                   <div className="flex items-center justify-between pt-3 border-t border-white/5">
                     <span className="text-xs text-zinc-400 flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> Distância: 2.5km
+                      <MapPin className="w-3 h-3" /> {item.city}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${item.fee === "Grátis" ? "bg-primary/10 text-primary border border-primary/20" : "bg-zinc-800 text-zinc-300"}`}>
-                      {item.fee === "Grátis" ? "Entrega Grátis" : `Taxa ${item.fee}`}
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${item.deliveryFee === "0" || item.deliveryFee === "Grátis" ? "bg-primary/10 text-primary border border-primary/20" : "bg-zinc-800 text-zinc-300"}`}>
+                      {item.deliveryFee === "0" || item.deliveryFee === "Grátis" ? "Entrega Grátis" : `Taxa R$ ${item.deliveryFee || "4,99"}`}
                     </span>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )) : (
+            <div className="text-center py-8 text-zinc-500">
+              <p className="text-sm">Nenhum restaurante encontrado</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

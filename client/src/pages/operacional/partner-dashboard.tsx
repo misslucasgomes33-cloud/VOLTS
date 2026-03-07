@@ -1,10 +1,12 @@
 import { Store, ShoppingBag, CheckCircle, Clock, ChevronRight, TrendingUp, AlertTriangle, Crown, Star, Sparkles, Activity } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 
 export default function PartnerDashboard() {
-  const [storeStatus, setStoreStatus] = useState(true); // true = open
-  const [activeTab, setActiveTab] = useState('pedidos'); // 'pedidos' or 'assinatura'
+  const { user } = useAuth();
+  const [storeStatus, setStoreStatus] = useState(true);
+  const [activeTab, setActiveTab] = useState('pedidos');
 
   return (
     <div className="flex flex-col min-h-screen bg-black pb-24">
@@ -20,7 +22,7 @@ export default function PartnerDashboard() {
             </div>
             <div>
               <h2 className="text-white font-bold text-sm flex items-center gap-1">
-                Volt Burger 
+                {user?.name || "Parceiro"} 
                 <span className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase">Pro</span>
               </h2>
               <div className="flex items-center gap-2 mt-0.5">

@@ -3,10 +3,43 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Register() {
   const [, setLocation] = useLocation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
+  const { toast } = useToast();
+
+  const handleRegister = async () => {
+    if (!name || !email || !password) {
+      toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast({ title: "As senhas não coincidem", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const cityName = city.startsWith("vg") ? "Várzea Grande" : "Cuiabá";
+      await register({ name, email, password, phone, role: "client", city: cityName });
+      toast({ title: "Conta criada com sucesso!" });
+      setLocation("/home");
+    } catch (error: any) {
+      toast({ title: error.message || "Erro ao criar conta", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col p-6 bg-background relative overflow-hidden">
@@ -23,12 +56,31 @@ export default function Register() {
         <p className="text-muted-foreground text-sm mb-8">Junte-se à revolução das entregas rápidas.</p>
 
         <div className="space-y-4 flex-1">
-          <Input placeholder="Nome completo" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
-          <Input type="email" placeholder="E-mail" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
-          <Input type="text" placeholder="CPF" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
-          <Input type="tel" placeholder="Telefone / WhatsApp" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
+          <Input 
+            data-testid="input-register-name"
+            placeholder="Nome completo" 
+            className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" 
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input 
+            data-testid="input-register-email"
+            type="email" 
+            placeholder="E-mail" 
+            className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input 
+            data-testid="input-register-phone"
+            type="tel" 
+            placeholder="Telefone / WhatsApp" 
+            className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" 
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
           
-          <Select>
+          <Select onValueChange={setCity}>
             <SelectTrigger className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50 text-left">
               <SelectValue placeholder="Selecione sua cidade e zona" />
             </SelectTrigger>
@@ -38,10 +90,6 @@ export default function Register() {
                 <SelectItem value="cba-centro">Centro</SelectItem>
                 <SelectItem value="cba-cpa">CPA</SelectItem>
                 <SelectItem value="cba-santa-rosa">Santa Rosa</SelectItem>
-                <SelectItem value="cba-tres-americas">Três Américas</SelectItem>
-                <SelectItem value="cba-jardim-universitario">Jardim Universitário</SelectItem>
-                <SelectItem value="cba-tijucal">Tijucal</SelectItem>
-                <SelectItem value="cba-jardim-imperial">Jardim Imperial</SelectItem>
                 <SelectItem value="cba-coxipo">Coxipó</SelectItem>
               </SelectGroup>
               <SelectGroup>
@@ -49,23 +97,35 @@ export default function Register() {
                 <SelectItem value="vg-centro">Centro</SelectItem>
                 <SelectItem value="vg-cristo-rei">Cristo Rei</SelectItem>
                 <SelectItem value="vg-ponte-nova">Ponte Nova</SelectItem>
-                <SelectItem value="vg-santa-isabel">Santa Isabel</SelectItem>
-                <SelectItem value="vg-sao-matheus">São Matheus</SelectItem>
-                <SelectItem value="vg-imperial-mapim-esperanca">Jd. Imperial / Mapim / Nova Esperança</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-          <p className="text-[10px] text-zinc-500 -mt-2 px-1">Esta seleção define os restaurantes disponíveis na sua região.</p>
 
-          <Input type="password" placeholder="Senha" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
-          <Input type="password" placeholder="Confirmar senha" className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" />
+          <Input 
+            data-testid="input-register-password"
+            type="password" 
+            placeholder="Senha" 
+            className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Input 
+            data-testid="input-register-confirm"
+            type="password" 
+            placeholder="Confirmar senha" 
+            className="h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl focus-visible:ring-primary/50" 
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
         </div>
 
         <Button 
+          data-testid="button-register"
           className="w-full h-14 bg-primary hover:bg-primary/90 text-black font-bold text-lg rounded-xl mt-8 shadow-[0_0_20px_rgba(255,204,0,0.2)]"
-          onClick={() => setLocation("/home")}
+          onClick={handleRegister}
+          disabled={loading}
         >
-          Cadastrar
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Cadastrar"}
         </Button>
       </div>
     </div>
