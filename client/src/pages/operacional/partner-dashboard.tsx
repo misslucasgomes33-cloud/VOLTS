@@ -210,9 +210,13 @@ export default function PartnerDashboard() {
                   <Crown className="w-6 h-6 text-yellow-500" />
                   <h4 className="text-2xl font-black text-white italic">PRO</h4>
                 </div>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-3xl font-bold text-yellow-500">R$ 109,99</span>
+                  <span className="text-zinc-400 text-sm">/mês</span>
+                </div>
                 <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-3xl font-bold text-yellow-500">10%</span>
-                  <span className="text-zinc-400 text-sm">de taxa</span>
+                  <span className="text-lg font-bold text-yellow-500/70">10%</span>
+                  <span className="text-zinc-500 text-xs">de taxa por pedido</span>
                 </div>
                 <p className="text-xs text-zinc-300 mb-6 font-medium">O ecossistema completo para dominar as vendas e gerir seu negócio.</p>
                 
@@ -243,9 +247,13 @@ export default function PartnerDashboard() {
                 <Star className="w-5 h-5 text-primary" />
                 <h4 className="text-xl font-black text-white">PREMIUM</h4>
               </div>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-2xl font-bold text-primary">R$ 49,99</span>
+                <span className="text-zinc-400 text-sm">/mês</span>
+              </div>
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-2xl font-bold text-primary">13%</span>
-                <span className="text-zinc-400 text-sm">de taxa</span>
+                <span className="text-lg font-bold text-primary/70">13%</span>
+                <span className="text-zinc-500 text-xs">de taxa por pedido</span>
               </div>
               <p className="text-xs text-zinc-400 mb-6">Ideal para quem quer crescer e aparecer mais para os clientes.</p>
               
