@@ -38,8 +38,13 @@ export default function QRCodeGenerator({ type, url }: QRCodeGeneratorProps) {
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Convert SVG to data URL
+    // Convert SVG to data URL properly handling characters
     const svgData = new XMLSerializer().serializeToString(svg);
+    // Use encodeURIComponent to handle special characters correctly before base64 encoding
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const DOMURL = window.URL || window.webkitURL || window;
+    const url = DOMURL.createObjectURL(svgBlob);
+    
     const img = new Image();
     img.onload = () => {
       // Draw white background for QR
@@ -66,8 +71,10 @@ export default function QRCodeGenerator({ type, url }: QRCodeGeneratorProps) {
       downloadLink.download = `volts-qr-${type}.png`;
       downloadLink.href = `${pngFile}`;
       downloadLink.click();
+      DOMURL.revokeObjectURL(url);
     };
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+    
+    img.src = url;
   };
 
   return (
