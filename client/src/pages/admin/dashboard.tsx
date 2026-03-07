@@ -7,8 +7,10 @@ import MapComponent from "@/components/MapComponent";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
-// Import the generated video
-import promoVideo from '@/assets/videos/promo-volts.mp4';
+// Import the generated videos
+import promoLaunchVideo from '@/assets/videos/promo-volts.mp4';
+import promoDriverVideo from '@/assets/videos/driver-promo.mp4';
+import promoPartnerVideo from '@/assets/videos/partner-promo.mp4';
 
 // Mock data for zones capacity
 const zoneCapacity = [
@@ -70,6 +72,24 @@ export default function AdminDashboard() {
   const handleMarketingPromptSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!marketingPrompt.trim()) return;
+    
+    // Check if user is asking for something specific like a business card or different type of video
+    const promptLower = marketingPrompt.toLowerCase();
+    
+    if (promptLower.includes('cartão') || promptLower.includes('visita')) {
+      setActiveTab('qr');
+      setMarketingPrompt('');
+      return;
+    }
+    
+    if (promptLower.includes('restaurante') || promptLower.includes('parceiro')) {
+      setTemplate('partner');
+    } else if (promptLower.includes('motoboy') || promptLower.includes('entregador')) {
+      setTemplate('driver');
+    } else {
+      setTemplate('launch');
+    }
+    
     handleGenerate();
   };
 
@@ -595,7 +615,7 @@ export default function AdminDashboard() {
                   <div className="flex flex-col">
                     <div className="w-full max-w-[280px] mx-auto aspect-[9/16] bg-black rounded-2xl overflow-hidden relative border border-white/5 mb-4 group">
                       <video 
-                        src={promoVideo} 
+                        src={template === 'driver' ? promoDriverVideo : template === 'partner' ? promoPartnerVideo : promoLaunchVideo} 
                         className="w-full h-full object-cover"
                         autoPlay 
                         loop 
@@ -611,17 +631,17 @@ export default function AdminDashboard() {
                       {/* Overlay preview mockup */}
                       <div className="absolute bottom-6 left-4 right-4 text-center z-10">
                         <h4 className="text-white font-black font-display text-2xl uppercase italic drop-shadow-lg mb-1">
-                          CHEGAMOS! ⚡
+                          {template === 'driver' ? 'VENHA PARA A VOLTS! 🛵' : template === 'partner' ? 'VENDAS DECOLANDO! 🚀' : 'CHEGAMOS! ⚡'}
                         </h4>
                         <div className="bg-primary text-black font-bold text-xs px-3 py-1.5 rounded-full inline-block">
-                          BAIXE O APP E GANHE R$10
+                          {template === 'driver' ? 'TAXA ZERO NO PRIMEIRO MÊS' : template === 'partner' ? 'CADASTRE SEU RESTAURANTE' : 'BAIXE O APP E GANHE R$10'}
                         </div>
                       </div>
                     </div>
 
                     <a 
-                      href={promoVideo} 
-                      download="volts-promo.mp4"
+                      href={template === 'driver' ? promoDriverVideo : template === 'partner' ? promoPartnerVideo : promoLaunchVideo} 
+                      download={`volts-promo-${template}.mp4`}
                       className="w-full max-w-[280px] mx-auto h-12 bg-white hover:bg-zinc-200 text-black font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
                     >
                       <Download className="w-4 h-4" /> Baixar Vídeo (MP4)
@@ -690,7 +710,7 @@ export default function AdminDashboard() {
                   Crie QR Codes personalizados com a marca VOLTS para panfletos, restaurantes, redes sociais e uniformes.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <QRCodeGenerator 
                     type="cliente" 
                     url="https://appvolts.com.br/download/cliente" 
@@ -703,6 +723,15 @@ export default function AdminDashboard() {
                     type="parceiro" 
                     url="https://appvolts.com.br/parceiros/cadastro" 
                   />
+                  <div className="flex flex-col h-full">
+                    <QRCodeGenerator 
+                      type="cliente" 
+                      url="https://appvolts.com.br/cartao-visitas" 
+                    />
+                    <div className="mt-2 text-center">
+                      <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">Cartão de Visitas (Internet)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
