@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
-import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send, Map as MapIcon, Navigation } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Video, Download, Sparkles, Instagram, PlayCircle, Loader2, ArrowLeft, Users, AlertCircle, PlusCircle, Building2, ShieldAlert, Cpu, Activity, BrainCircuit, ArrowRight, CheckCircle2, Mic, Bot, MessageSquare, Send, Map as MapIcon, Navigation, FileText, DollarSign, ListOrdered, Shield, QrCode, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
 import MapComponent from "@/components/MapComponent";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 
 // Import the generated video
 import promoVideo from '@/assets/videos/promo-volts.mp4';
@@ -19,21 +20,36 @@ const zoneCapacity = [
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState('ai'); // 'ai', 'marketing', 'capacity', or 'map'
+  const [activeTab, setActiveTab] = useState('marketing'); // 'ai', 'marketing', 'capacity', 'map', 'users', 'orders', 'financial', 'logs', 'qr'
   const [adminRole, setAdminRole] = useState('adm'); // adm or gerencia
+  const [adminCity, setAdminCity] = useState('Global');
   
   // Marketing State
   const [isGenerating, setIsGenerating] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [template, setTemplate] = useState("launch");
+  const [marketingPrompt, setMarketingPrompt] = useState("");
+  const [isMarketingListening, setIsMarketingListening] = useState(false);
 
   const handleGenerate = () => {
     setIsGenerating(true);
+    setVideoReady(false);
     // Simulate generation time
     setTimeout(() => {
       setIsGenerating(false);
       setVideoReady(true);
     }, 2500);
+  };
+
+  const clearCreative = () => {
+    setVideoReady(false);
+    setMarketingPrompt("");
+  };
+
+  const handleMarketingPromptSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!marketingPrompt.trim()) return;
+    handleGenerate();
   };
 
   // AI Chat State
@@ -164,7 +180,15 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('marketing')}
               className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'marketing' ? 'bg-purple-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
             >
-              <Video className="w-3.5 h-3.5" /> Criativos
+              <Video className="w-3.5 h-3.5" /> Criativos IA
+            </button>
+          )}
+          {adminRole === 'adm' && (
+            <button 
+              onClick={() => setActiveTab('qr')}
+              className={`flex-1 min-w-[120px] py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === 'qr' ? 'bg-indigo-600 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              <QrCode className="w-3.5 h-3.5" /> QR Codes
             </button>
           )}
           <button 
@@ -368,101 +392,261 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* MARKETING VIEW */}
         {activeTab === 'marketing' && adminRole === 'adm' && (
           <div className="animate-in fade-in duration-300">
             <div className="bg-gradient-to-br from-purple-900/20 to-zinc-900 border border-purple-500/30 rounded-3xl p-6 relative overflow-hidden mb-6">
               <div className="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 blur-3xl rounded-full" />
               
               <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-purple-400" />
-                  <h2 className="text-lg font-bold text-white">Gerador de Criativos IA</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-400" />
+                    <h2 className="text-lg font-bold text-white">Agência de Marketing IA</h2>
+                  </div>
+                  {videoReady && (
+                    <Button 
+                      onClick={clearCreative}
+                      variant="outline" 
+                      size="sm" 
+                      className="border-red-500/30 text-red-400 hover:bg-red-500/10 h-8 text-xs font-bold"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1" /> Limpar Criativos
+                    </Button>
+                  )}
                 </div>
                 
                 <p className="text-sm text-zinc-300 mb-6">
-                  Crie vídeos promocionais virais para o TikTok, Reels e Status do WhatsApp usando IA em segundos.
+                  Crie vídeos, banners e textos promocionais. A IA gera narração, música de fundo e artes automaticamente.
                 </p>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs text-zinc-400 font-bold uppercase tracking-wider mb-2 block">Selecione o Modelo</label>
-                    <Select value={template} onValueChange={setTemplate}>
-                      <SelectTrigger className="w-full h-14 bg-zinc-900/50 border-white/10 text-white rounded-xl">
-                        <SelectValue placeholder="Escolha um modelo" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                        <SelectItem value="launch">🚀 Lançamento (App p/ Clientes)</SelectItem>
-                        <SelectItem value="driver">🏍️ Recrutamento de Entregadores</SelectItem>
-                        <SelectItem value="partner">🏪 Captação de Restaurantes</SelectItem>
-                        <SelectItem value="promo">🍕 Promoções & Cupons (Flash)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-4 mb-6">
+                  <form onSubmit={handleMarketingPromptSubmit} className="relative">
+                    <div className="absolute left-4 top-4">
+                      <Bot className={`w-5 h-5 ${isMarketingListening ? 'text-red-400 animate-pulse' : 'text-purple-400'}`} />
+                    </div>
+                    <textarea 
+                      value={marketingPrompt}
+                      onChange={(e) => setMarketingPrompt(e.target.value)}
+                      placeholder='Ex: "Crie um vídeo chamando motoboys para trabalhar no VOLTS em Cuiabá" ou "Faça um banner de frete grátis"'
+                      className="w-full bg-zinc-950 border border-white/10 rounded-xl pl-12 pr-12 py-4 text-sm text-white focus:outline-none focus:border-purple-500/50 min-h-[100px] resize-none"
+                    />
+                    <div className="absolute right-3 bottom-3 flex gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => setIsMarketingListening(!isMarketingListening)}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                          isMarketingListening ? 'bg-red-500/20 text-red-400' : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        <Mic className="w-4 h-4" />
+                      </button>
+                      <button 
+                        type="submit"
+                        disabled={isGenerating || !marketingPrompt.trim()}
+                        className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:hover:bg-purple-600 text-white flex items-center justify-center transition-colors"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </form>
 
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => {
+                        setMarketingPrompt("Seja criativa e monte uma campanha do zero para captar novos parceiros (restaurantes) no VOLTS, oferecendo 1 mês sem taxa.");
+                        setTimeout(() => handleGenerate(), 500);
+                      }}
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold h-12 rounded-xl border-none"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" /> Seja Criativa! (Auto)
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-px bg-white/10 flex-1" />
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Ou use modelos rápidos</span>
+                  <div className="h-px bg-white/10 flex-1" />
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <Button 
-                    onClick={handleGenerate}
+                    onClick={() => { setTemplate('launch'); handleGenerate(); }}
                     disabled={isGenerating}
-                    className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl flex items-center justify-center gap-2"
+                    variant="outline" 
+                    className="border-white/10 bg-zinc-900/50 hover:bg-white/5 text-xs h-10"
                   >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" /> Gerando criativo...
-                      </>
-                    ) : (
-                      <>
-                        <Video className="w-5 h-5" /> Gerar Vídeo Vertical
-                      </>
-                    )}
+                    🚀 App Clientes
+                  </Button>
+                  <Button 
+                    onClick={() => { setTemplate('driver'); handleGenerate(); }}
+                    disabled={isGenerating}
+                    variant="outline" 
+                    className="border-white/10 bg-zinc-900/50 hover:bg-white/5 text-xs h-10"
+                  >
+                    🏍️ Motoboys
+                  </Button>
+                  <Button 
+                    onClick={() => { setTemplate('partner'); handleGenerate(); }}
+                    disabled={isGenerating}
+                    variant="outline" 
+                    className="border-white/10 bg-zinc-900/50 hover:bg-white/5 text-xs h-10"
+                  >
+                    🏪 Parceiros
+                  </Button>
+                  <Button 
+                    onClick={() => { setTemplate('promo'); handleGenerate(); }}
+                    disabled={isGenerating}
+                    variant="outline" 
+                    className="border-white/10 bg-zinc-900/50 hover:bg-white/5 text-xs h-10"
+                  >
+                    🍕 Promos
                   </Button>
                 </div>
+                
+                {isGenerating && (
+                  <div className="mt-6 flex flex-col items-center justify-center p-6 bg-black/40 rounded-2xl border border-white/5">
+                    <Loader2 className="w-8 h-8 text-purple-500 animate-spin mb-3" />
+                    <p className="text-sm font-bold text-white mb-1">A IA está trabalhando...</p>
+                    <p className="text-xs text-zinc-400 text-center animate-pulse">
+                      Escrevendo roteiro, gerando narração, aplicando música e renderizando animações...
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
             {videoReady && (
-              <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 animate-in fade-in zoom-in duration-500">
+              <div className="bg-zinc-900 border border-white/10 rounded-3xl p-5 animate-in fade-in zoom-in duration-500 mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-bold text-white flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    Criativo Pronto!
+                    Campanha Pronta!
                   </h3>
                   <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center cursor-pointer hover:bg-pink-600 transition-colors">
                       <Instagram className="w-4 h-4 text-white" />
                     </div>
                   </div>
                 </div>
 
-                <div className="w-full aspect-[9/16] bg-black rounded-2xl overflow-hidden relative border border-white/5 mb-4 group">
-                  <video 
-                    src={promoVideo} 
-                    className="w-full h-full object-cover"
-                    autoPlay 
-                    loop 
-                    muted
-                    playsInline
-                  />
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center text-black backdrop-blur-sm cursor-pointer">
-                      <PlayCircle className="w-8 h-8" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Video Preview */}
+                  <div className="flex flex-col">
+                    <div className="w-full max-w-[280px] mx-auto aspect-[9/16] bg-black rounded-2xl overflow-hidden relative border border-white/5 mb-4 group">
+                      <video 
+                        src={promoVideo} 
+                        className="w-full h-full object-cover"
+                        autoPlay 
+                        loop 
+                        muted
+                        playsInline
+                      />
+                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center text-black backdrop-blur-sm cursor-pointer">
+                          <PlayCircle className="w-8 h-8" />
+                        </div>
+                      </div>
+                      
+                      {/* Overlay preview mockup */}
+                      <div className="absolute bottom-6 left-4 right-4 text-center z-10">
+                        <h4 className="text-white font-black font-display text-2xl uppercase italic drop-shadow-lg mb-1">
+                          CHEGAMOS! ⚡
+                        </h4>
+                        <div className="bg-primary text-black font-bold text-xs px-3 py-1.5 rounded-full inline-block">
+                          BAIXE O APP E GANHE R$10
+                        </div>
+                      </div>
                     </div>
+
+                    <a 
+                      href={promoVideo} 
+                      download="volts-promo.mp4"
+                      className="w-full max-w-[280px] mx-auto h-12 bg-white hover:bg-zinc-200 text-black font-bold rounded-xl flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <Download className="w-4 h-4" /> Baixar Vídeo (MP4)
+                    </a>
                   </div>
-                  
-                  {/* Overlay preview mockup */}
-                  <div className="absolute bottom-6 left-4 right-4 text-center z-10">
-                    <h4 className="text-white font-black font-display text-2xl uppercase italic drop-shadow-lg mb-1">
-                      CHEGAMOS! ⚡
-                    </h4>
-                    <div className="bg-primary text-black font-bold text-xs px-3 py-1.5 rounded-full inline-block">
-                      BAIXE O APP E GANHE R$10
+
+                  {/* Generated Assets Info */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
+                    <h4 className="text-purple-400 font-bold text-xs uppercase tracking-wider mb-4">Ativos Gerados</h4>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-[10px] text-zinc-500 mb-1">Áudio Gerado (Narração AI)</p>
+                        <div className="bg-zinc-900 border border-white/10 rounded-lg p-2 flex items-center gap-2">
+                          <div className="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center">
+                            <Mic className="w-3 h-3 text-purple-400" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="h-1 bg-zinc-800 rounded-full overflow-hidden w-full">
+                              <div className="h-full bg-purple-500 w-1/3"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-xs text-zinc-300 italic mt-2">
+                          {template === 'driver' ? '"Trabalhe como motoboy VOLTS e receba seus ganhos toda semana..."' :
+                           template === 'partner' ? '"Seja parceiro VOLTS e aumente suas vendas sem taxas abusivas..."' :
+                           '"Peça agora pelo VOLTS e receba em minutos na sua porta..."'}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-[10px] text-zinc-500 mb-1">Música de Fundo</p>
+                        <p className="text-xs text-white">Upbeat Corporate Electronic (Licença Inclusa)</p>
+                      </div>
+
+                      <div>
+                        <p className="text-[10px] text-zinc-500 mb-1">Legenda para o Post</p>
+                        <p className="text-xs text-zinc-300 bg-zinc-900 p-2 rounded-lg border border-white/5">
+                          {template === 'driver' ? '🚀 Chegou a hora de acelerar seus ganhos! Faça seu próprio horário, seja dono do seu caminho e corra com a VOLTS. ⚡️ Baixe o app VOLTS Operacional agora mesmo e cadastre-se! #EntregadorVolts #Motoboy' :
+                           template === 'partner' ? '🏪 Chega de taxas abusivas! Seja parceiro VOLTS e veja suas vendas decolarem. Baixe o app Operacional e cadastre seu restaurante! #ParceiroVolts #Delivery' :
+                           '🍔 Bateu aquela fome? Peça pelo VOLTS! Entrega rápida, cupons exclusivos e os melhores restaurantes da cidade. Baixe agora! #VoltsDelivery #Fome'}
+                        </p>
+                        <button className="text-[10px] text-purple-400 font-bold mt-2 hover:text-purple-300 transition-colors">Copiar Texto</button>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <Button className="w-full h-12 bg-white hover:bg-zinc-200 text-black font-bold rounded-xl flex items-center justify-center gap-2">
-                  <Download className="w-4 h-4" /> Baixar Vídeo (MP4)
-                </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* QR CODE GENERATOR */}
+        {activeTab === 'qr' && adminRole === 'adm' && (
+          <div className="animate-in fade-in duration-300">
+            <div className="bg-gradient-to-br from-indigo-900/20 to-zinc-900 border border-indigo-500/30 rounded-3xl p-6 relative overflow-hidden mb-6">
+              <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-indigo-500/20 blur-3xl rounded-full" />
+              
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <QrCode className="w-5 h-5 text-indigo-400" />
+                  <h2 className="text-lg font-bold text-white">Gerador de QR Codes</h2>
+                </div>
+                
+                <p className="text-sm text-zinc-300 mb-6">
+                  Crie QR Codes personalizados com a marca VOLTS para panfletos, restaurantes, redes sociais e uniformes.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <QRCodeGenerator 
+                    type="cliente" 
+                    url="https://appvolts.com.br/download/cliente" 
+                  />
+                  <QRCodeGenerator 
+                    type="motoboy" 
+                    url="https://appvolts.com.br/download/operacional" 
+                  />
+                  <QRCodeGenerator 
+                    type="parceiro" 
+                    url="https://appvolts.com.br/parceiros/cadastro" 
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
