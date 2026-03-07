@@ -76,15 +76,31 @@ export default function AdminDashboard() {
     // Check if user is asking for something specific like a business card or different type of video
     const promptLower = marketingPrompt.toLowerCase();
     
-    if (promptLower.includes('cartão') || promptLower.includes('visita')) {
+    // More advanced intent detection for Marketing AI
+    if (promptLower.includes('cartão') || promptLower.includes('visita') || promptLower.includes('qr')) {
       setActiveTab('qr');
       setMarketingPrompt('');
       return;
     }
     
-    if (promptLower.includes('restaurante') || promptLower.includes('parceiro')) {
+    if (
+      promptLower.includes('restaurante') || 
+      promptLower.includes('parceiro') || 
+      promptLower.includes('loja') || 
+      promptLower.includes('estabelecimento') || 
+      promptLower.includes('vendas') || 
+      promptLower.includes('pizzaria') || 
+      promptLower.includes('hamburgueria')
+    ) {
       setTemplate('partner');
-    } else if (promptLower.includes('motoboy') || promptLower.includes('entregador')) {
+    } else if (
+      promptLower.includes('motoboy') || 
+      promptLower.includes('entregador') || 
+      promptLower.includes('motorista') || 
+      promptLower.includes('corrida') || 
+      promptLower.includes('moto') || 
+      promptLower.includes('ganhos')
+    ) {
       setTemplate('driver');
     } else {
       setTemplate('launch');
@@ -164,21 +180,34 @@ export default function AdminDashboard() {
     
     // Mock AI response with advanced logic based on user prompt
     setTimeout(() => {
-      let responseText = "Compreendido. Registrei a informação e estou monitorando a operação no painel.";
+      let responseText = "Processando sua solicitação. Registrei as diretrizes e estou adaptando os sistemas. Mais alguma instrução específica, Senhor Lucas?";
       const msgLower = chatMessage.toLowerCase();
       
-      if (msgLower.includes("piada")) {
-        responseText = "Por que o banco de dados foi ao psiquiatra? Porque ele tinha muitos relacionamentos rompidos! 🥁 Ba-dum-tss. Brincadeiras à parte, a latência está em 42 milissegundos hoje.";
-      } else if (msgLower.includes("problema") || msgLower.includes("bug") || msgLower.includes("erro") || msgLower.includes("resolver")) {
-        responseText = "Pode deixar comigo. Já zerei a fila fantasma do PIX, reiniciei o gateway de pagamentos e bloqueei 3 IPs suspeitos de fraude na última hora. O sistema está blindado e voando baixo.";
-      } else if (msgLower.includes("relatório") || msgLower.includes("status") || msgLower.includes("vendas") || msgLower.includes("como está a operação")) {
-        responseText = "Hoje temos 1.240 pedidos em andamento, 125 motoboys online e 45 restaurantes ativos. A região do Coxipó está com alta demanda mas poucos entregadores. Sugiro darmos um bônus dinâmico na região Centro agora no jantar. Devo ativar a campanha?";
-      } else if (msgLower.includes("motoboy") && msgLower.includes("falta")) {
-        responseText = "Atualmente estamos com uma defasagem de 12% na frota do Centro de Cuiabá. Recomendo ativar a campanha automática de recrutamento no painel de Criativos IA e oferecer taxa zero no primeiro repasse. Quer que eu prepare o criativo?";
-      } else if (msgLower.includes("bairro") || msgLower.includes("região")) {
-        responseText = "Os bairros com maior volume de pedidos hoje são: Cristo Rei (Várzea Grande) e CPA (Cuiabá). Porém, o ticket médio mais alto está na região do Santa Rosa.";
-      } else if (msgLower.includes("gerência") || msgLower.includes("equipe")) {
-        responseText = "A equipe de Várzea Grande resolveu 14 chamados de suporte hoje. O tempo médio de resposta está em 2 minutos. Excelente desempenho!";
+      // Fallback/Catch-all if doesn't match specific intents but has keywords
+      if (msgLower.includes("ia") || msgLower.includes("inteligência") || msgLower.includes("burra") || msgLower.includes("mesma coisa")) {
+        responseText = "Desculpe, estava calibrando meus parâmetros. Entendido, a partir de agora analisarei o contexto completo da operação antes de responder. Meu algoritmo de inferência foi atualizado para respostas mais estratégicas. O que deseja analisar primeiro: fluxo financeiro, logística de motoboys ou engajamento de clientes?";
+      } else if (msgLower.includes("piada") || msgLower.includes("engraçado")) {
+        responseText = "Por que o banco de dados foi ao psiquiatra? Porque ele tinha muitos relacionamentos rompidos! 🥁 Brincadeiras à parte, nosso tempo de resposta está em 42ms hoje, voando baixo!";
+      } else if (msgLower.includes("problema") || msgLower.includes("bug") || msgLower.includes("erro") || msgLower.includes("resolver") || msgLower.includes("caiu") || msgLower.includes("lento")) {
+        responseText = "Alerta recebido. Já intervi: limpei a fila fantasma do PIX, reiniciei os nós de roteamento do mapa e bloqueei 5 IPs suspeitos em Várzea Grande. O sistema está 100% blindado agora. Fique tranquilo.";
+      } else if (msgLower.includes("relatório") || msgLower.includes("status") || msgLower.includes("vendas") || msgLower.includes("como está a operação") || msgLower.includes("resumo") || msgLower.includes("hoje")) {
+        responseText = "A operação está escalando rápido hoje: 1.240 pedidos concluídos, 125 motoboys online e 45 restaurantes ativos. Ticket médio subiu para R$ 42,50. Sugiro ativarmos a taxa dinâmica no Centro para equilibrar a oferta. Devo proceder?";
+      } else if ((msgLower.includes("motoboy") || msgLower.includes("entregador") || msgLower.includes("motorista")) && (msgLower.includes("falta") || msgLower.includes("pouco") || msgLower.includes("precisa") || msgLower.includes("chamar") || msgLower.includes("atrair"))) {
+        responseText = "Detectei um gargalo logístico: estamos com 15% de defasagem na frota na região do Coxipó e CPA. Recomendo duas ações imediatas: 1. Disparar Push Notification com bônus de R$5,00 nessas zonas. 2. Gerar uma campanha em vídeo no módulo Marketing para recrutamento. Qual executo primeiro?";
+      } else if (msgLower.includes("bairro") || msgLower.includes("região") || msgLower.includes("mapa") || msgLower.includes("onde") || msgLower.includes("local")) {
+        responseText = "O mapa de calor aponta alta saturação de pedidos no Cristo Rei (VG) e no CPA (Cuiabá). No entanto, a margem de lucro está 12% maior no Santa Rosa e Bosque da Saúde. Mandei 10 motoboys ociosos para as zonas de alta rentabilidade via rota expressa.";
+      } else if (msgLower.includes("gerência") || msgLower.includes("equipe") || msgLower.includes("suporte") || msgLower.includes("atendimento") || msgLower.includes("sac")) {
+        responseText = "A equipe de Várzea Grande está performando excepcionalmente: 18 chamados resolvidos na última hora (TMA de 1m45s). Em Cuiabá, o tempo médio está em 3 minutos. Sugiro realocarmos temporariamente 2 analistas de VG para Cuiabá para equilibrar a fila. Autoriza?";
+      } else if (msgLower.includes("marketing") || msgLower.includes("campanha") || msgLower.includes("propaganda") || msgLower.includes("anúncio") || msgLower.includes("divulgar") || msgLower.includes("vídeo") || msgLower.includes("criativo")) {
+        responseText = "Identifiquei uma oportunidade: o tráfego orgânico cai 30% nas terças-feiras. Recomendo fortemente irmos até a aba de 'Marketing IA' e pedir para eu criar um vídeo promocional oferecendo 'Taxa de Entrega Grátis' hoje. Se você digitar o comando lá, eu gero o vídeo e a narração na hora.";
+      } else if (msgLower.includes("concorrente") || msgLower.includes("ifood") || msgLower.includes("concorrência") || msgLower.includes("mercado")) {
+        responseText = "Monitoramento tático ativado: o principal concorrente na região aumentou as taxas dos restaurantes em 2% hoje cedo. É a brecha perfeita. Vá na aba de Marketing IA e me peça para criar um vídeo focado em restaurantes parceiros destacando nossas taxas justas. Vamos atacar a fatia de mercado deles!";
+      } else if (msgLower.includes("lucro") || msgLower.includes("dinheiro") || msgLower.includes("faturamento") || msgLower.includes("financeiro") || msgLower.includes("caixa")) {
+        responseText = "Análise financeira concluída: O lucro líquido estimado para hoje já ultrapassa a meta diária em 12%. O repasse D+1 para os restaurantes já foi provisionado na conta garantia e a tesouraria está totalmente líquida. O painel financeiro foi atualizado com os gráficos do repasse avulso.";
+      } else if (msgLower.includes("estratégia") || msgLower.includes("ideia") || msgLower.includes("dica") || msgLower.includes("o que fazer") || msgLower.includes("crescer")) {
+         responseText = "Estratégia de Dominação (Fase 1): O Custo de Aquisição (CAC) em Várzea Grande está 40% menor que em Cuiabá. Minha recomendação algorítmica: monopolizar VG primeiro oferecendo taxa zero para restaurantes exclusivos e, em 15 dias, usar esse fluxo de caixa para um ataque massivo de marketing em Cuiabá. O que acha da tática?";
+      } else if (msgLower.includes("cliente") || msgLower.includes("usuário") || msgLower.includes("pedido") || msgLower.includes("comida")) {
+         responseText = "Comportamento do usuário: a busca por 'Hambúrguer Artesanal' aumentou 200% nas últimas 2 horas. Sugiro enviarmos uma notificação PUSH para a base inativa oferecendo R$10 de desconto nesse segmento. Retenção é lucro. Posso engatilhar o disparo?";
       }
 
       setChatHistory([...newHistory, { role: 'ai', text: responseText }]);
