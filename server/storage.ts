@@ -2,12 +2,15 @@ import { eq, and, desc } from "drizzle-orm";
 import { db } from "./db";
 import {
   users, restaurants, menuItems, orders, orderItems, deliveries,
+  subscriptions, transactions,
   type User, type InsertUser,
   type Restaurant, type InsertRestaurant,
   type MenuItem, type InsertMenuItem,
   type Order, type InsertOrder,
   type OrderItem, type InsertOrderItem,
   type Delivery, type InsertDelivery,
+  type Subscription, type InsertSubscription,
+  type Transaction, type InsertTransaction,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -40,6 +43,18 @@ export interface IStorage {
   getAvailableDeliveries(city?: string): Promise<any[]>;
 
   getDrivers(city?: string, online?: boolean): Promise<User[]>;
+
+  getSubscription(restaurantId: string): Promise<Subscription | undefined>;
+  getSubscriptionById(id: string): Promise<Subscription | undefined>;
+  createSubscription(sub: InsertSubscription): Promise<Subscription>;
+  updateSubscription(id: string, data: Partial<Subscription>): Promise<Subscription | undefined>;
+
+  getTransaction(id: string): Promise<Transaction | undefined>;
+  getTransactionByMercadoPagoId(mpId: string): Promise<Transaction | undefined>;
+  getTransactionByReference(refId: string): Promise<Transaction | undefined>;
+  getTransactions(filters?: { userId?: string; type?: string }): Promise<Transaction[]>;
+  createTransaction(tx: InsertTransaction): Promise<Transaction>;
+  updateTransaction(id: string, data: Partial<Transaction>): Promise<Transaction | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -181,6 +196,63 @@ export class DatabaseStorage implements IStorage {
     if (online) conditions.push(eq(users.isOnline, true));
     if (city && city !== "Global") conditions.push(eq(users.city, city));
     return db.select().from(users).where(and(...conditions));
+  }
+
+  async getSubscription(restaurantId: string): Promise<Subscription | undefined> {
+    const [sub] = await db.select().from(subscriptions)
+      .where(and(eq(subscriptions.restaurantId, restaurantId), eq(subscriptions.active, true)))
+      .orderBy(desc(subscriptions.createdAt));
+    return sub;
+  }
+
+  async getSubscriptionById(id: string): Promise<Subscription | undefined> {
+    const [sub] = await db.select().from(subscriptions).where(eq(subscriptions.id, id));
+    return sub;
+  }
+
+  async createSubscription(sub: InsertSubscription): Promise<Subscription> {
+    const [s] = await db.insert(subscriptions).values(sub).returning();
+    return s;
+  }
+
+  async updateSubscription(id: string, data: Partial<Subscription>): Promise<Subscription | undefined> {
+    const [s] = await db.update(subscriptions).set(data).where(eq(subscriptions.id, id)).returning();
+    return s;
+  }
+
+  async getTransaction(id: string): Promise<Transaction | undefined> {
+    const [tx] = await db.select().from(transactions).where(eq(transactions.id, id));
+    return tx;
+  }
+
+  async getTransactionByMercadoPagoId(mpId: string): Promise<Transaction | undefined> {
+    const [tx] = await db.select().from(transactions).where(eq(transactions.mercadoPagoId, mpId));
+    return tx;
+  }
+
+  async getTransactionByReference(refId: string): Promise<Transaction | undefined> {
+    const [tx] = await db.select().from(transactions).where(eq(transactions.referenceId, refId));
+    return tx;
+  }
+
+  async getTransactions(filters?: { userId?: string; type?: string }): Promise<Transaction[]> {
+    const conditions = [];
+    if (filters?.userId) conditions.push(eq(transactions.userId, filters.userId));
+    if (filters?.type) conditions.push(eq(transactions.type, filters.type));
+    if (conditions.length > 0) {
+      return db.select().from(transactions).where(and(...conditions)).orderBy(desc(transactions.createdAt));
+    }
+    return db.select().from(transactions).orderBy(desc(transactions.createdAt));
+  }
+
+  async createTransaction(tx: InsertTransaction): Promise<Transaction> {
+    const [t] = await db.insert(transactions).values(tx).returning();
+    return t;
+  }
+
+  async updateTransaction(id: string, data: Partial<Transaction>): Promise<Transaction | undefined> {
+    const [t] = await db.update(transactions).set(data).where(eq(transactions.id, id)).returning();
+    return t;
   }
 }
 

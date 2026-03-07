@@ -93,6 +93,51 @@ export const deliveries = pgTable("deliveries", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending", "approved", "rejected", "cancelled", "refunded", "in_process"
+]);
+
+export const paymentMethodEnum = pgEnum("payment_method", ["pix", "credit_card"]);
+
+export const subscriptionPlanEnum = pgEnum("subscription_plan", ["free", "premium", "pro"]);
+
+export const subscriptions = pgTable("subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  restaurantId: varchar("restaurant_id").references(() => restaurants.id).notNull(),
+  plan: subscriptionPlanEnum("plan").notNull().default("free"),
+  price: decimal("price").default("0"),
+  startsAt: timestamp("starts_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  active: boolean("active").default(false),
+  mercadoPagoSubId: text("mercado_pago_sub_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const transactions = pgTable("transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(),
+  referenceId: varchar("reference_id"),
+  userId: varchar("user_id").references(() => users.id),
+  amount: decimal("amount").notNull(),
+  paymentMethod: paymentMethodEnum("payment_method"),
+  paymentStatus: paymentStatusEnum("payment_status").notNull().default("pending"),
+  mercadoPagoId: text("mercado_pago_id"),
+  mercadoPagoStatus: text("mercado_pago_status"),
+  pixQrCode: text("pix_qr_code"),
+  pixQrCodeBase64: text("pix_qr_code_base64"),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true });
+export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type Transaction = typeof transactions.$inferSelect;
+
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertRestaurantSchema = createInsertSchema(restaurants).omit({ id: true, createdAt: true });
 export const insertMenuItemSchema = createInsertSchema(menuItems).omit({ id: true });

@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { loginSchema, registerSchema } from "@shared/schema";
+import { isMercadoPagoConfigured, createPixPayment, createCardPayment, getPayment } from "./mercadopago";
 
 const connectedClients = new Map<string, Set<WebSocket>>();
 
@@ -305,6 +306,329 @@ export async function registerRoutes(
     if (!user) return res.status(404).json({ message: "Motorista não encontrado" });
     const { password, ...safeUser } = user;
     return res.json(safeUser);
+  });
+
+  // PAYMENTS - Mercado Pago
+  app.get("/api/payments/config", (req, res) => {
+    return res.json({ configured: isMercadoPagoConfigured() });
+  });
+
+  app.post("/api/payments/subscription", async (req, res) => {
+    try {
+      const { restaurantId, plan, userId, paymentMethod } = req.body;
+
+      if (!restaurantId || !plan || !userId) {
+        return res.status(400).json({ message: "Dados incompletos" });
+      }
+
+      const prices: Record<string, number> = { premium: 49.99, pro: 109.99 };
+      const amount = prices[plan];
+      if (!amount) {
+        return res.status(400).json({ message: "Plano inválido" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+
+      const sub = await storage.createSubscription({
+        restaurantId,
+        plan: plan as any,
+        price: amount.toString(),
+        active: false,
+      });
+
+      const tx = await storage.createTransaction({
+        type: "subscription",
+        referenceId: sub.id,
+        userId,
+        amount: amount.toString(),
+        paymentMethod: paymentMethod || "pix",
+        paymentStatus: "pending",
+      });
+
+      if (!isMercadoPagoConfigured()) {
+        return res.json({
+          transactionId: tx.id,
+          subscriptionId: sub.id,
+          status: "pending",
+          message: "Mercado Pago não configurado. Adicione MERCADO_PAGO_ACCESS_TOKEN nas variáveis de ambiente.",
+          simulatedPayment: true,
+        });
+      }
+
+      if (paymentMethod === "pix") {
+        const host = req.get("host") || "";
+        const isPublic = host.includes("replit") || host.includes("repl.co");
+        const notificationUrl = isPublic ? `https://${host}/api/webhooks/mercadopago` : undefined;
+        const mpPayment = await createPixPayment({
+          amount,
+          description: `VOLTS - Assinatura ${plan.toUpperCase()}`,
+          externalReference: `sub:${sub.id}:tx:${tx.id}`,
+          payerEmail: user.email,
+          payerName: user.name,
+          notificationUrl,
+        });
+
+        await storage.updateTransaction(tx.id, {
+          mercadoPagoId: mpPayment.id,
+          mercadoPagoStatus: mpPayment.status,
+          pixQrCode: mpPayment.qrCode,
+          pixQrCodeBase64: mpPayment.qrCodeBase64,
+        });
+
+        return res.json({
+          transactionId: tx.id,
+          subscriptionId: sub.id,
+          status: mpPayment.status,
+          pixQrCode: mpPayment.qrCode,
+          pixQrCodeBase64: mpPayment.qrCodeBase64,
+          ticketUrl: mpPayment.ticketUrl,
+        });
+      }
+
+      return res.json({
+        transactionId: tx.id,
+        subscriptionId: sub.id,
+        status: "awaiting_card",
+        message: "Envie o token do cartão via /api/payments/card",
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/payments/order", async (req, res) => {
+    try {
+      const { orderId, userId, paymentMethod } = req.body;
+
+      if (!orderId || !userId) {
+        return res.status(400).json({ message: "Dados incompletos" });
+      }
+
+      const order = await storage.getOrder(orderId);
+      if (!order) return res.status(404).json({ message: "Pedido não encontrado" });
+
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+
+      const amount = parseFloat(order.total) + parseFloat(order.deliveryFee || "0");
+
+      const tx = await storage.createTransaction({
+        type: "order",
+        referenceId: orderId,
+        userId,
+        amount: amount.toString(),
+        paymentMethod: paymentMethod || "pix",
+        paymentStatus: "pending",
+      });
+
+      if (!isMercadoPagoConfigured()) {
+        return res.json({
+          transactionId: tx.id,
+          orderId,
+          status: "pending",
+          message: "Mercado Pago não configurado. Adicione MERCADO_PAGO_ACCESS_TOKEN nas variáveis de ambiente.",
+          simulatedPayment: true,
+        });
+      }
+
+      if (paymentMethod === "pix") {
+        const host = req.get("host") || "";
+        const isPublic = host.includes("replit") || host.includes("repl.co");
+        const notificationUrl = isPublic ? `https://${host}/api/webhooks/mercadopago` : undefined;
+        const mpPayment = await createPixPayment({
+          amount,
+          description: `VOLTS - Pedido #${orderId.slice(0, 8)}`,
+          externalReference: `order:${orderId}:tx:${tx.id}`,
+          payerEmail: user.email,
+          payerName: user.name,
+          notificationUrl,
+        });
+
+        await storage.updateTransaction(tx.id, {
+          mercadoPagoId: mpPayment.id,
+          mercadoPagoStatus: mpPayment.status,
+          pixQrCode: mpPayment.qrCode,
+          pixQrCodeBase64: mpPayment.qrCodeBase64,
+        });
+
+        return res.json({
+          transactionId: tx.id,
+          orderId,
+          status: mpPayment.status,
+          pixQrCode: mpPayment.qrCode,
+          pixQrCodeBase64: mpPayment.qrCodeBase64,
+          ticketUrl: mpPayment.ticketUrl,
+        });
+      }
+
+      return res.json({
+        transactionId: tx.id,
+        orderId,
+        status: "awaiting_card",
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/payments/card", async (req, res) => {
+    try {
+      const { transactionId, token, installments, docType, docNumber } = req.body;
+
+      if (!transactionId || !token) {
+        return res.status(400).json({ message: "Token do cartão é obrigatório" });
+      }
+
+      const tx = await storage.getTransaction(transactionId);
+      if (!tx) return res.status(404).json({ message: "Transação não encontrada" });
+
+      const user = tx.userId ? await storage.getUser(tx.userId) : null;
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+
+      if (!isMercadoPagoConfigured()) {
+        return res.json({
+          transactionId: tx.id,
+          status: "pending",
+          simulatedPayment: true,
+          message: "Mercado Pago não configurado.",
+        });
+      }
+
+      const host = req.get("host") || "";
+      const isPublic = host.includes("replit") || host.includes("repl.co");
+      const notificationUrl = isPublic ? `https://${host}/api/webhooks/mercadopago` : undefined;
+      const mpPayment = await createCardPayment({
+        amount: parseFloat(tx.amount),
+        description: tx.type === "subscription" ? "VOLTS - Assinatura" : `VOLTS - Pedido`,
+        externalReference: tx.type === "subscription" ? `sub:${tx.referenceId}:tx:${tx.id}` : `order:${tx.referenceId}:tx:${tx.id}`,
+        token,
+        installments: installments || 1,
+        payerEmail: user.email,
+        payerName: user.name,
+        payerDocType: docType || "CPF",
+        payerDocNumber: docNumber || "",
+        notificationUrl,
+      });
+
+      await storage.updateTransaction(tx.id, {
+        mercadoPagoId: mpPayment.id,
+        mercadoPagoStatus: mpPayment.status,
+        paymentStatus: mpPayment.status === "approved" ? "approved" : mpPayment.status === "rejected" ? "rejected" : "in_process",
+      });
+
+      if (mpPayment.status === "approved") {
+        await handlePaymentApproved(tx);
+      }
+
+      return res.json({
+        transactionId: tx.id,
+        status: mpPayment.status,
+        statusDetail: mpPayment.statusDetail,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/payments/simulate-approve", async (req, res) => {
+    try {
+      const { transactionId } = req.body;
+      const tx = await storage.getTransaction(transactionId);
+      if (!tx) return res.status(404).json({ message: "Transação não encontrada" });
+
+      await storage.updateTransaction(tx.id, {
+        paymentStatus: "approved",
+        mercadoPagoStatus: "approved",
+      });
+
+      await handlePaymentApproved(tx);
+
+      return res.json({ message: "Pagamento aprovado (simulado)", transactionId: tx.id });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  });
+
+  async function handlePaymentApproved(tx: any) {
+    if (tx.type === "subscription" && tx.referenceId) {
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      await storage.updateSubscription(tx.referenceId, {
+        active: true,
+        startsAt: now,
+        expiresAt,
+      });
+    }
+    if (tx.type === "order" && tx.referenceId) {
+      await storage.updateOrderStatus(tx.referenceId, "accepted");
+      const order = await storage.getOrder(tx.referenceId);
+      if (order) broadcastOrderUpdate(order);
+    }
+  }
+
+  app.post("/api/webhooks/mercadopago", async (req, res) => {
+    try {
+      const { type, data } = req.body;
+
+      if (type === "payment") {
+        const paymentId = data?.id?.toString();
+        if (!paymentId) return res.sendStatus(200);
+
+        if (!isMercadoPagoConfigured()) return res.sendStatus(200);
+
+        const mpPayment = await getPayment(paymentId);
+        const externalRef = mpPayment.external_reference || "";
+
+        const txIdMatch = externalRef.match(/tx:(.+)$/);
+        const txId = txIdMatch?.[1];
+
+        let tx = txId ? await storage.getTransaction(txId) : null;
+        if (!tx) {
+          tx = await storage.getTransactionByMercadoPagoId(paymentId);
+        }
+
+        if (tx) {
+          const newStatus = mpPayment.status === "approved" ? "approved"
+            : mpPayment.status === "rejected" ? "rejected"
+            : mpPayment.status === "cancelled" ? "cancelled"
+            : "in_process";
+
+          await storage.updateTransaction(tx.id, {
+            paymentStatus: newStatus as any,
+            mercadoPagoStatus: mpPayment.status,
+          });
+
+          if (mpPayment.status === "approved") {
+            await handlePaymentApproved(tx);
+          }
+        }
+      }
+
+      return res.sendStatus(200);
+    } catch (error: any) {
+      console.error("Webhook error:", error.message);
+      return res.sendStatus(200);
+    }
+  });
+
+  app.get("/api/subscriptions/:restaurantId", async (req, res) => {
+    const sub = await storage.getSubscription(req.params.restaurantId);
+    return res.json(sub || { plan: "free", active: false });
+  });
+
+  app.get("/api/transactions", async (req, res) => {
+    const filters: any = {};
+    if (req.query.userId) filters.userId = req.query.userId;
+    if (req.query.type) filters.type = req.query.type;
+    const txs = await storage.getTransactions(filters);
+    return res.json(txs);
+  });
+
+  app.get("/api/transactions/:id", async (req, res) => {
+    const tx = await storage.getTransaction(req.params.id);
+    if (!tx) return res.status(404).json({ message: "Transação não encontrada" });
+    return res.json(tx);
   });
 
   // SEED DATA

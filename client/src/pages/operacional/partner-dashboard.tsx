@@ -1,12 +1,106 @@
-import { Store, ShoppingBag, CheckCircle, Clock, ChevronRight, TrendingUp, AlertTriangle, Crown, Star, Sparkles, Activity } from "lucide-react";
-import { useState } from "react";
+import { Store, ShoppingBag, CheckCircle, Clock, ChevronRight, TrendingUp, AlertTriangle, Crown, Star, Sparkles, Activity, X, QrCode, CreditCard, Loader2, Copy, Check } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PartnerDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [storeStatus, setStoreStatus] = useState(true);
   const [activeTab, setActiveTab] = useState('pedidos');
+  const [paymentModal, setPaymentModal] = useState<{ plan: string; price: number } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit_card">("pix");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentResult, setPaymentResult] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
+  const [currentSub, setCurrentSub] = useState<any>(null);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/restaurants/owner/${user.id}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.id) {
+          setRestaurantId(data.id);
+          fetch(`/api/subscriptions/${data.id}`)
+            .then(r => r.json())
+            .then(sub => setCurrentSub(sub))
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, [user]);
+
+  const handleSubscribe = async (plan: string, price: number) => {
+    setPaymentModal({ plan, price });
+    setPaymentResult(null);
+    setPaymentMethod("pix");
+  };
+
+  const processPayment = async () => {
+    if (!paymentModal || !restaurantId || !user) return;
+    setPaymentLoading(true);
+    try {
+      const res = await fetch("/api/payments/subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          restaurantId,
+          plan: paymentModal.plan,
+          userId: user.id,
+          paymentMethod,
+        }),
+      });
+      const data = await res.json();
+      setPaymentResult(data);
+
+      if (data.simulatedPayment) {
+        toast({ title: "Pagamento criado em modo simulação" });
+      }
+    } catch (error: any) {
+      toast({ title: error.message || "Erro ao processar pagamento", variant: "destructive" });
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const simulateApproval = async () => {
+    if (!paymentResult?.transactionId) return;
+    setPaymentLoading(true);
+    try {
+      const res = await fetch("/api/payments/simulate-approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactionId: paymentResult.transactionId }),
+      });
+      const data = await res.json();
+      toast({ title: "Plano ativado com sucesso!" });
+      setPaymentModal(null);
+      setPaymentResult(null);
+      if (restaurantId) {
+        fetch(`/api/subscriptions/${restaurantId}`)
+          .then(r => r.json())
+          .then(sub => setCurrentSub(sub))
+          .catch(() => {});
+      }
+    } catch (error: any) {
+      toast({ title: "Erro ao simular aprovação", variant: "destructive" });
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const copyPixCode = () => {
+    if (paymentResult?.pixQrCode) {
+      navigator.clipboard.writeText(paymentResult.pixQrCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const activePlan = currentSub?.active ? currentSub.plan : "free";
 
   return (
     <div className="flex flex-col min-h-screen bg-black pb-24">
@@ -200,9 +294,11 @@ export default function PartnerDashboard() {
 
             {/* PRO Plan (Highlighted) */}
             <div className="bg-gradient-to-b from-zinc-800 to-zinc-900 border-2 border-yellow-500 rounded-3xl p-6 relative overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.15)]">
-              <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-                Seu Plano Atual
-              </div>
+              {activePlan === "pro" && (
+                <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
+                  Seu Plano Atual
+                </div>
+              )}
               <div className="absolute -right-10 -top-10 w-40 h-40 bg-yellow-500/20 blur-3xl rounded-full" />
               
               <div className="relative z-10">
@@ -235,8 +331,13 @@ export default function PartnerDashboard() {
                   </li>
                 </ul>
                 
-                <Button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl h-12">
-                  Gerenciar Plano PRO
+                <Button 
+                  data-testid="button-subscribe-pro"
+                  className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl h-12"
+                  onClick={() => activePlan !== "pro" && handleSubscribe("pro", 109.99)}
+                  disabled={activePlan === "pro"}
+                >
+                  {activePlan === "pro" ? "Plano Ativo" : "Assinar Plano PRO"}
                 </Button>
               </div>
             </div>
@@ -269,8 +370,14 @@ export default function PartnerDashboard() {
                 </li>
               </ul>
               
-              <Button variant="outline" className="w-full bg-zinc-800/50 hover:bg-zinc-800 border-primary/20 text-white font-bold rounded-xl h-12">
-                Mudar para Premium
+              <Button 
+                data-testid="button-subscribe-premium"
+                variant="outline" 
+                className="w-full bg-zinc-800/50 hover:bg-zinc-800 border-primary/20 text-white font-bold rounded-xl h-12"
+                onClick={() => activePlan !== "premium" && handleSubscribe("premium", 49.99)}
+                disabled={activePlan === "premium"}
+              >
+                {activePlan === "premium" ? "Plano Ativo" : "Assinar Premium"}
               </Button>
             </div>
 
@@ -295,6 +402,120 @@ export default function PartnerDashboard() {
           </div>
         )}
       </div>
+
+      {paymentModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-white/10 rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-white/5">
+              <h3 className="text-lg font-bold text-white">
+                Assinar {paymentModal.plan.toUpperCase()}
+              </h3>
+              <button onClick={() => { setPaymentModal(null); setPaymentResult(null); }} className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-5">
+              <div className="bg-zinc-800/50 rounded-2xl p-4 text-center border border-white/5">
+                <p className="text-zinc-400 text-xs uppercase tracking-wider mb-1">Total</p>
+                <p className="text-3xl font-black text-white">R$ {paymentModal.price.toFixed(2).replace(".", ",")}</p>
+                <p className="text-zinc-500 text-xs mt-1">Mensal - renovação automática</p>
+              </div>
+
+              {!paymentResult ? (
+                <>
+                  <div className="space-y-3">
+                    <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider">Forma de pagamento</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        data-testid="button-pix"
+                        onClick={() => setPaymentMethod("pix")}
+                        className={`p-4 rounded-2xl border-2 text-center transition-all ${paymentMethod === "pix" ? "border-green-500 bg-green-500/10" : "border-white/10 bg-zinc-800/50"}`}
+                      >
+                        <QrCode className={`w-6 h-6 mx-auto mb-2 ${paymentMethod === "pix" ? "text-green-500" : "text-zinc-400"}`} />
+                        <span className={`text-sm font-bold ${paymentMethod === "pix" ? "text-green-500" : "text-zinc-300"}`}>PIX</span>
+                        <p className="text-[10px] text-zinc-500 mt-1">Aprovação instantânea</p>
+                      </button>
+                      <button
+                        data-testid="button-card"
+                        onClick={() => setPaymentMethod("credit_card")}
+                        className={`p-4 rounded-2xl border-2 text-center transition-all ${paymentMethod === "credit_card" ? "border-blue-500 bg-blue-500/10" : "border-white/10 bg-zinc-800/50"}`}
+                      >
+                        <CreditCard className={`w-6 h-6 mx-auto mb-2 ${paymentMethod === "credit_card" ? "text-blue-500" : "text-zinc-400"}`} />
+                        <span className={`text-sm font-bold ${paymentMethod === "credit_card" ? "text-blue-500" : "text-zinc-300"}`}>Cartão</span>
+                        <p className="text-[10px] text-zinc-500 mt-1">Crédito em até 12x</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button
+                    data-testid="button-pay"
+                    onClick={processPayment}
+                    disabled={paymentLoading}
+                    className="w-full h-14 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl"
+                  >
+                    {paymentLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Pagar R$ ${paymentModal.price.toFixed(2).replace(".", ",")}`}
+                  </Button>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  {paymentResult.pixQrCode ? (
+                    <>
+                      <div className="bg-white rounded-2xl p-6 flex items-center justify-center">
+                        <img
+                          src={`data:image/png;base64,${paymentResult.pixQrCodeBase64}`}
+                          alt="QR Code PIX"
+                          className="w-48 h-48"
+                        />
+                      </div>
+                      <button
+                        onClick={copyPixCode}
+                        className="w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-3 rounded-xl transition-colors"
+                      >
+                        {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                        {copied ? "Código copiado!" : "Copiar código PIX"}
+                      </button>
+                      <p className="text-center text-xs text-zinc-500">
+                        Escaneie o QR Code ou copie o código para pagar no seu banco
+                      </p>
+                    </>
+                  ) : paymentResult.simulatedPayment ? (
+                    <div className="text-center space-y-4">
+                      <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto border border-yellow-500/30">
+                        <AlertTriangle className="w-8 h-8 text-yellow-500" />
+                      </div>
+                      <div>
+                        <p className="text-white font-bold">Modo Simulação</p>
+                        <p className="text-xs text-zinc-400 mt-1">
+                          O Mercado Pago ainda não está configurado. Você pode simular a aprovação do pagamento para testar o fluxo.
+                        </p>
+                      </div>
+                      <Button
+                        data-testid="button-simulate-approve"
+                        onClick={simulateApproval}
+                        disabled={paymentLoading}
+                        className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl"
+                      >
+                        {paymentLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Simular Aprovação do Pagamento"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-white font-bold">Aguardando pagamento...</p>
+                      <p className="text-xs text-zinc-400 mt-2">Status: {paymentResult.status}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 justify-center pt-2">
+                <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/6.6.92/mercadopago/logo__large@2x.png" alt="Mercado Pago" className="h-5 opacity-50" />
+                <span className="text-[10px] text-zinc-600">Pagamento seguro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
